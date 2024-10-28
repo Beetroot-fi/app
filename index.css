@@ -1,0 +1,36 @@
+@font-face {
+  font-family: "Gagalin";
+  src: url("src/assets/fonts/Gagalin/Gagalin-Regular.otf");
+  font-weight: 400;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Gagalin";
+}
+
+button {
+  padding: 0;
+  border: none !important;
+  outline: none !important;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+li {
+  list-style-type: none;
+}
+
+body {
+  background-color: rgba(224, 28, 63, 1);
+}
+
+img,
+svg {
+  width: 100%;
+}

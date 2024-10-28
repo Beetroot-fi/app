@@ -1,0 +1,29 @@
+.wrapper {
+    width: 100vw;
+    min-height: 100vh;
+    position: relative;
+}
+
+.inner {
+    max-width: 768px;
+    width: 100%;
+    margin: 0 auto;
+    height: 100vh;
+    padding: 0 25px;
+    padding-top: 90px;
+    padding-bottom: 60px;
+    overflow: auto;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #F5B3BF;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+}
