@@ -8,6 +8,12 @@ interface TelegramAuthProps {
   onAuthComplete: (success: boolean) => void;
 }
 
+declare global {
+  interface Window {
+    Telegram: any;
+  }
+}
+
 const TelegramAuth: React.FC<TelegramAuthProps> = ({ onAuthComplete }) => {
   useEffect(() => {
     const handleAuth = async () => {
@@ -16,7 +22,6 @@ const TelegramAuth: React.FC<TelegramAuthProps> = ({ onAuthComplete }) => {
         const initData = tg.initData;
 
         if (!initData) {
-          console.error("No initData available");
           onAuthComplete(false);
           return;
         }
@@ -24,7 +29,6 @@ const TelegramAuth: React.FC<TelegramAuthProps> = ({ onAuthComplete }) => {
         await apiService.login(initData);
         onAuthComplete(true);
       } catch (error) {
-        console.error("Authentication failed:", error);
         onAuthComplete(false);
       }
     };
@@ -32,7 +36,6 @@ const TelegramAuth: React.FC<TelegramAuthProps> = ({ onAuthComplete }) => {
     if (window.Telegram?.WebApp) {
       handleAuth();
     } else {
-      console.error("Telegram WebApp is not available");
       onAuthComplete(false);
     }
   }, [onAuthComplete]);
