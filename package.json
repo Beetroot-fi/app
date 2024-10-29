@@ -12,6 +12,7 @@
   "dependencies": {
     "@ton/core": "^0.59.0",
     "@tonconnect/ui-react": "^2.0.9",
+    "axios": "^1.7.7",
     "clsx": "^2.1.1",
     "mobx": "^6.13.5",
     "mobx-react-lite": "^4.0.7",
