@@ -121,14 +121,24 @@ api.interceptors.response.use(
 );
 
 export const apiService = {
-    login: async (initData: string): Promise<AuthTokens> => {
-        const response = await api.post<AuthTokens>('/api/v1/auth/login', {
-            query_str: initData
-        });
-        return response.data;
+    login: async (initData: string) => {
+        try {
+            const response = await api.post<AuthTokens>('/api/v1/auth/login', {
+                "query_str": initData
+            });
+
+            const { access_token, refresh_token } = response.data;
+            localStorage.setItem('accessToken', access_token);
+            localStorage.setItem('refreshToken', refresh_token);
+
+            return response.data;
+        } catch (error) {
+            console.error('Login error:', error);
+            throw error;
+        }
     },
 
-    refreshTokens: async (): Promise<AuthTokens> => {
+    refreshTokens: async () => {
         try {
             return await refreshAuthTokens();
         } catch (error) {
