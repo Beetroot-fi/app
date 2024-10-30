@@ -77,12 +77,10 @@ api.interceptors.response.use(
     (response: AxiosResponse) => response,
     async (error: AxiosError) => {
         const originalRequest = error.config as CustomAxiosRequestConfig;
-
         if (error.response?.status === 401 &&
             originalRequest &&
             originalRequest.url !== '/api/v1/auth/refresh' &&
             !originalRequest._retry) {
-
             if (isRefreshing) {
                 try {
                     const token = await new Promise<string>((resolve) => {
@@ -90,9 +88,8 @@ api.interceptors.response.use(
                             resolve(token);
                         });
                     });
-
                     if (originalRequest.headers) {
-                        originalRequest.headers['access-token'] = token;
+                        originalRequest.headers['token'] = token;
                     }
                     return api(originalRequest);
                 } catch (err) {
@@ -106,9 +103,8 @@ api.interceptors.response.use(
             try {
                 const { access_token } = await refreshAuthTokens();
                 onTokenRefreshed(access_token);
-
                 if (originalRequest.headers) {
-                    originalRequest.headers['access-token'] = access_token;
+                    originalRequest.headers['token'] = access_token;
                 }
                 return api(originalRequest);
             } catch (refreshError) {
@@ -125,24 +121,14 @@ api.interceptors.response.use(
 );
 
 export const apiService = {
-    login: async (initData: string) => {
-        try {
-            const response = await api.post<AuthTokens>('/api/v1/auth/login', {
-                "query_str": initData
-            });
-
-            const { access_token, refresh_token } = response.data;
-            localStorage.setItem('accessToken', access_token);
-            localStorage.setItem('refreshToken', refresh_token);
-
-            return response.data;
-        } catch (error) {
-            console.error('Login error:', error);
-            throw error;
-        }
+    login: async (initData: string): Promise<AuthTokens> => {
+        const response = await api.post<AuthTokens>('/api/v1/auth/login', {
+            query_str: initData
+        });
+        return response.data;
     },
 
-    refreshTokens: async () => {
+    refreshTokens: async (): Promise<AuthTokens> => {
         try {
             return await refreshAuthTokens();
         } catch (error) {
@@ -186,24 +172,8 @@ export const apiService = {
             const response = await api.get<TaskRead[]>('/api/v1/tasks/completed');
             return response;
         } catch (error) {
-            console.error('Failed to fetch tasks:', error)
+            console.error('Failed to fetch completed tasks:', error)
             throw error;
         }
-    },
-
-    get: <T>(url: string, params?: object) => {
-        return api.get<T>(url, { params });
-    },
-
-    post: <T>(url: string, data?: object) => {
-        return api.post<T>(url, data);
-    },
-
-    put: <T>(url: string, data?: object) => {
-        return api.put<T>(url, data);
-    },
-
-    delete: <T>(url: string) => {
-        return api.delete<T>(url);
-    },
+    }
 };
