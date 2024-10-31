@@ -32,7 +32,19 @@ export async function getJettonWalletAddress(
         jettonMasterAddress,
         'get_wallet_address',
         [{ type: 'slice', cell: beginCell().storeAddress(userAddress).endCell() }],
-    )
+    );
 
     return result.stack.readAddress();
+}
+
+
+export async function getJettonWalletData(client: TonClient, jettonWalletAddress: Address) {
+    const result = await client.runMethod(jettonWalletAddress, 'get_wallet_data', []);
+
+    return {
+        balance: result.stack.readBigNumber(),
+        owner: result.stack.readAddress(),
+        minter: result.stack.readAddress(),
+        wallet_code: result.stack.readCell()
+    }
 }
