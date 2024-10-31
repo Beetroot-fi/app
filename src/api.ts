@@ -7,7 +7,7 @@ let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
 
 const api: AxiosInstance = axios.create({
-    baseURL: "https://api.beetroot.finance",
+    baseURL: process.env.REACT_APP_API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
