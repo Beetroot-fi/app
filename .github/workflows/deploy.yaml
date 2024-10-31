@@ -54,7 +54,6 @@ jobs:
           echo "Transferring dist.tar.gz to server"
           scp -v dist.tar.gz www@$SERVER_IP:/var/www || { echo "Failed to transfer dist.tar.gz"; exit 1; }
 
-          echo "Deploying new dist and restarting Nginx"
           ssh -v www@$SERVER_IP "
             cd ../../var/www &&
             tar -xzf dist.tar.gz &&
