@@ -75,11 +75,11 @@ const App: React.FC = () => {
 
   return (
     <TonConnectUIProvider manifestUrl="https://raw.githubusercontent.com/Beetroot-fi/app/refs/heads/main/tonconnect-manifest.json">
-      {/* {!isAuthenticated ? (
+      {!isAuthenticated ? (
         <TelegramAuth onAuthComplete={handleAuthComplete} />
-      ) : ( */}
-      <AppRoutes />
-      {/* )} */}
+      ) : (
+        <AppRoutes />
+      )}
     </TonConnectUIProvider>
   );
 };
