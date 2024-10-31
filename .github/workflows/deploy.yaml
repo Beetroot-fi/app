@@ -8,13 +8,12 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "20"
 
@@ -27,36 +26,50 @@ jobs:
       - name: Archive dist folder
         run: tar -czf dist.tar.gz dist
 
+      - name: Prepare SSH
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo -e "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keygen -y -f ~/.ssh/id_ed25519 || {
+            echo "Invalid SSH Ed25519 key format"
+            exit 1
+          }
+
       - name: Copy and Deploy to Server
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
         run: |
           set -e
-
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          echo "SSH key setup completed"
-
           ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts
-          echo "Added $SERVER_IP to known hosts"
 
-          echo "Testing SSH connection to server"
-          ssh -v -o StrictHostKeyChecking=no www@$SERVER_IP "echo 'SSH connection successful'" || { echo "SSH connection failed"; exit 1; }
+          ssh -i ~/.ssh/id_ed25519 \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              www@$SERVER_IP "hostname" || {
+            echo "SSH connection failed"
+            exit 1
+          }
 
-          echo "Removing dist-old and renaming dist to dist-old on server"
-          ssh -v www@$SERVER_IP "
-            sudo rm -rf ../../var/www/dist-old &&
-            sudo mv ../../var/www/dist /var/www/dist-old
-          " || { echo "Failed to modify folders on server"; exit 1; }
+          scp -i ~/.ssh/id_ed25519 \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              dist.tar.gz www@$SERVER_IP:/var/www || {
+            echo "File transfer failed"
+            exit 1
+          }
 
-          echo "Transferring dist.tar.gz to server"
-          scp -v dist.tar.gz www@$SERVER_IP:/var/www || { echo "Failed to transfer dist.tar.gz"; exit 1; }
-
-          ssh -v www@$SERVER_IP "
-            cd ../../var/www &&
-            tar -xzf dist.tar.gz &&
-            sudo rm dist.tar.gz &&
-            sudo systemctl restart nginx
-          " || { echo "Failed to deploy or restart Nginx"; exit 1; }
+          ssh -i ~/.ssh/id_ed25519 \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              www@$SERVER_IP "
+                cd /var/www &&
+                tar -xzf dist.tar.gz &&
+                sudo systemctl restart nginx
+              " || {
+            echo "Deployment or Nginx restart failed"
+            exit 1
+          }
