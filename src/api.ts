@@ -185,5 +185,15 @@ export const apiService = {
             console.error('Failed to fetch completed tasks:', error)
             throw error;
         }
+    },
+
+    completeTask: async (taskId: string) => {
+        try {
+            const response = await api.post(`/api/v1/tasks/complete?task_id=${taskId}`);
+            return response;
+        } catch (error) {
+            console.error('Failed to complete task:', error)
+            throw error;
+        }
     }
 };
