@@ -27,11 +27,13 @@ jobs:
       - name: Archive dist folder
         run: tar -czf dist.tar.gz dist
 
-      - name: Copy files to server
+      - name: Copy and Deploy to Server
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
         run: |
+          set -e
+
           mkdir -p ~/.ssh
           echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
@@ -41,16 +43,21 @@ jobs:
           echo "Added $SERVER_IP to known hosts"
 
           echo "Testing SSH connection to server"
-          ssh -o StrictHostKeyChecking=no www@$SERVER_IP "echo 'SSH connection successful'"
+          ssh -v -o StrictHostKeyChecking=no www@$SERVER_IP "echo 'SSH connection successful'" || { echo "SSH connection failed"; exit 1; }
 
-          ssh www@$SERVER_IP "
+          echo "Removing dist-old and renaming dist to dist-old on server"
+          ssh -v www@$SERVER_IP "
             sudo rm -rf /var/www/dist-old &&
             sudo mv /var/www/dist /var/www/dist-old
-          "
-          scp dist.tar.gz www@$SERVER_IP:/var/www
-          ssh www@$SERVER_IP "
+          " || { echo "Failed to modify folders on server"; exit 1; }
+
+          echo "Transferring dist.tar.gz to server"
+          scp -v dist.tar.gz www@$SERVER_IP:/var/www || { echo "Failed to transfer dist.tar.gz"; exit 1; }
+
+          echo "Deploying new dist and restarting Nginx"
+          ssh -v www@$SERVER_IP "
             cd /var/www &&
             tar -xzf dist.tar.gz &&
             sudo rm dist.tar.gz &&
             sudo systemctl restart nginx
-          "
+          " || { echo "Failed to deploy or restart Nginx"; exit 1; }
