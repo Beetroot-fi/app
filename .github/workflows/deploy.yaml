@@ -17,59 +17,83 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+
+      - name: Archive dist folder
+        run: tar -czf dist.tar.gz dist
+
+      - name: Install SSH dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y expect sshpass
+
       - name: Prepare SSH
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
           SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
         run: |
-          set -x
+          mkdir -p ~/.ssh
+          echo -e "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
 
-          echo "SSH_KEY length: ${#SSH_KEY}"
-          echo "SSH_PASSPHRASE length: ${#SSH_PASSPHRASE}"
-
-          mkdir -p /home/runner/.ssh
-          chmod 700 /home/runner/.ssh
-
-          echo -e "$SSH_KEY" > /home/runner/.ssh/id_ed25519
-
-          ls -l /home/runner/.ssh/id_ed25519
-          cat /home/runner/.ssh/id_ed25519
-
-          chmod 600 /home/runner/.ssh/id_ed25519
-
-          eval "$(ssh-agent -s)"
-
-          ssh-add /home/runner/.ssh/id_ed25519 <<< "$SSH_PASSPHRASE" || {
-            echo "Failed to add SSH key"
-            exit 1
+          cat > /tmp/add_ssh_key.exp <<EOL
+          #!/usr/bin/expect -f
+          set timeout -1
+          spawn ssh-add ~/.ssh/id_ed25519
+          expect {
+            "Enter passphrase" {
+              send "$env(SSH_PASSPHRASE)\r"
+              expect eof
+            }
+            eof
           }
+          EOL
 
-          ssh-keygen -y -f /home/runner/.ssh/id_ed25519
+          chmod +x /tmp/add_ssh_key.exp
+          eval "$(ssh-agent -s)"
+          /usr/bin/expect /tmp/add_ssh_key.exp
 
-      - name: Deploy
+      - name: Deploy to Server
         env:
           SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
           SERVER_IP: ${{ secrets.SERVER_IP }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
         run: |
-          ssh-add -l 
-
           ssh-keyscan -p "$SSH_PORT" -H "$SERVER_IP" >> ~/.ssh/known_hosts
 
-          ssh \
-            -p "$SSH_PORT" \
-            -o StrictHostKeyChecking=no \
-            -o UserKnownHostsFile=/dev/null \
-            www@$SERVER_IP "hostname" || {
-            echo "SSH connection failed"
-            exit 1
+          /usr/bin/expect <<EOL
+          spawn ssh -p $SSH_PORT -i ~/.ssh/id_ed25519 www@$SERVER_IP "
+            cd /var/www &&
+            sudo rm -rf dist-old &&
+            sudo mv dist dist-old 2>/dev/null || true
+          "
+          expect {
+            "Enter passphrase" {
+              send "$env(SSH_PASSPHRASE)\r"
+              expect eof
+            }
+            eof
           }
+          EOL
 
-          scp \
-            -P "$SSH_PORT" \
-            -o StrictHostKeyChecking=no \
-            -o UserKnownHostsFile=/dev/null \
-            dist.tar.gz www@$SERVER_IP:/var/www || {
-            echo "File transfer failed"
-            exit 1
+          scp -P "$SSH_PORT" -o StrictHostKeyChecking=no dist.tar.gz www@$SERVER_IP:/var/www
+
+          /usr/bin/expect <<EOL
+          spawn ssh -p $SSH_PORT -i ~/.ssh/id_ed25519 www@$SERVER_IP "
+            cd /var/www &&
+            tar -xzf dist.tar.gz &&
+            rm dist.tar.gz &&
+            sudo systemctl restart nginx
+          "
+          expect {
+            "Enter passphrase" {
+              send "$env(SSH_PASSPHRASE)\r"
+              expect eof
+            }
+            eof
           }
+          EOL
