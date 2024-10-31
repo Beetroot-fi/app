@@ -39,9 +39,11 @@ export const Tasks = () => {
           {tasks.length > 0 ? (
             tasks.map((task, index) => (
               <Link to={task.link} className={s.block_item} key={index}>
-                <div className={s.block_item_l}>{task.name}</div>
-                <div className={s.block_item_r}>
-                  <ArrowRightIcon />
+                <div className={s.block_item}>
+                  <div className={s.block_item_l}>{task.name}</div>
+                  <div className={s.block_item_r}>
+                    <ArrowRightIcon />
+                  </div>
                 </div>
               </Link>
             ))
