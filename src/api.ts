@@ -1,28 +1,7 @@
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig, AxiosResponse } from "axios";
-
-interface AuthTokens {
-    access_token: string;
-    refresh_token: string;
-}
-
-interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
-    _retry?: boolean;
-}
-
-export interface TaskRead {
-    task_id: string;
-    name: string;
-    description: string | null;
-    link: string;
-    type: string;
-}
-
-export interface UserRead {
-    first_name: string | null;
-    last_name: string | null;
-    username: string | null;
-    ref_link: string;
-}
+import axios, { AxiosInstance, AxiosError, AxiosResponse } from "axios";
+import { UserRead } from "./types/user";
+import { TaskRead } from "./types/tasks";
+import { AuthTokens, CustomAxiosRequestConfig } from "./types/api";
 
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];

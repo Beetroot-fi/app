@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { apiService, UserRead } from "../../../api";
+import { apiService } from "../../../api";
 import { InviteLinkIcon } from "../../../components/Icons/InviteLinkIcon";
 import s from "./Invite.module.scss";
 import Btn from "../../../components/Btn/Btn";
+import { UserRead } from "../../../types/user";
 
 export const Invite = () => {
   const [referrals, setReferrals] = useState<UserRead[]>([]);

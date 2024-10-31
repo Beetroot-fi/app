@@ -2,9 +2,10 @@ import clsx from "clsx";
 import { ArrowRightIcon } from "../../../components/Icons/ArrowRightIcon";
 import s from "./Tasks.module.scss";
 import { useEffect, useState } from "react";
-import { apiService, TaskRead } from "../../../api";
+import { apiService } from "../../../api";
 import { ThisInviteLinkIcon } from "../../../components/Icons/ThisInviteLinkIcon";
 import { Link } from "react-router-dom";
+import { TaskRead } from "../../../types/tasks";
 
 export const Tasks = () => {
   const [tasks, setTasks] = useState<TaskRead[]>([]);
@@ -31,14 +32,36 @@ export const Tasks = () => {
 
   if (loading) return <div>Loading...</div>;
 
+  const handleCompleteTask = async (task: TaskRead) => {
+    try {
+      await apiService.completeTask(task.task_id);
+
+      const updatedTasks = (await apiService.getTasks()).data;
+      setTasks(updatedTasks);
+
+      const updatedCompletedTasks = (await apiService.getCompletedTasks()).data;
+      setCompletedTasks(updatedCompletedTasks);
+    } catch (error) {
+      console.error("Failed to complete task:", error);
+    }
+  };
+
+  const completedTaskIds = new Set(completedTasks.map((task) => task.task_id));
+
   return (
     <div className={s.wrapper}>
       <div className={s.block}>
         <div className={s.block_title}>tasks:</div>
         <div className={s.block_items}>
-          {tasks.length > 0 ? (
+          {tasks.filter((task) => !completedTaskIds.has(task.task_id)).length >
+          0 ? (
             tasks.map((task, index) => (
-              <Link to={task.link} className={s.block_item} key={index}>
+              <Link
+                to={task.link}
+                className={s.block_item}
+                key={index}
+                onClick={() => handleCompleteTask(task)}
+              >
                 <div className={s.block_item}>
                   <div className={s.block_item_l}>{task.name}</div>
                   <div className={s.block_item_r}>
