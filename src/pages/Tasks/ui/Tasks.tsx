@@ -38,12 +38,12 @@ export const Tasks = () => {
         <div className={s.block_items}>
           {tasks.length > 0 ? (
             tasks.map((task, index) => (
-              <div className={s.block_item} key={index}>
+              <Link to={task.link} className={s.block_item} key={index}>
                 <div className={s.block_item_l}>{task.name}</div>
                 <div className={s.block_item_r}>
                   <ArrowRightIcon />
                 </div>
-              </div>
+              </Link>
             ))
           ) : (
             <div className={s.no_referrals}>No tasks yet</div>

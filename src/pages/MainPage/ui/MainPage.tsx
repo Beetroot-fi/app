@@ -24,11 +24,6 @@ export const MainPage = () => {
       {currentTabNum === 0 && <MainPageSwap />}
       {currentTabNum === 1 && <MainPageWithdraw />}
       {currentTabNum === 2 && <MainPageClaim />}
-      <Btn className={s.btn}>
-        {currentTabNum === 0 && "Swap"}
-        {currentTabNum === 1 && "Withdraw"}
-        {currentTabNum === 2 && "Claim"}
-      </Btn>
       {currentTabNum !== 2 && (
         <div className={s.bottom}>
           <div className={s.bottom_l}>!!!</div>

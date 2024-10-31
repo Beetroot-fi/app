@@ -14,9 +14,10 @@ interface Props {
     calculatedValue?: string;
     setCalculatedValue?: React.Dispatch<React.SetStateAction<string>>;
   };
+  setError?: React.Dispatch<React.SetStateAction<boolean>>; // добавляем setError в пропсы
 }
 
-export const MainPageInputRow: React.FC<Props> = ({ item }) => {
+export const MainPageInputRow: React.FC<Props> = ({ item, setError }) => {
   const [currentTabNum, setCurrentTabNum] = useState<number | null>(null);
   const [inputValue, setInputValue] = useState<string>("");
 
@@ -27,21 +28,27 @@ export const MainPageInputRow: React.FC<Props> = ({ item }) => {
 
     // Регулярное выражение для проверки: положительные числа, допускаются числа с точкой и не более 2 цифр после точки
     if (/^\d*\.?\d{0,2}$/.test(value)) {
-      // Преобразуем значение в число и проверяем, превышает ли оно баланс
       const numericValue = parseFloat(value);
+
+      // Ограничиваем значение максимальным балансом
       if (numericValue > item.balance) {
-        value = item.balance.toFixed(2); // Ограничиваем значением баланса
+        value = item.balance.toFixed(2);
       }
 
       setInputValue(value);
       setCurrentTabNum(null);
 
-      // Проверка на пустое значение
+      // Устанавливаем setCalculatedValue с учетом курса
       if (item.course && item.setCalculatedValue) {
         const calculatedValue = value
           ? (parseFloat(value) * item.course).toFixed(2)
           : "";
         item.setCalculatedValue(calculatedValue);
+      }
+
+      // Проверка на пустое значение или ноль, чтобы установить ошибку
+      if (setError) {
+        setError(!value || numericValue === 0);
       }
     }
   };
@@ -58,14 +65,19 @@ export const MainPageInputRow: React.FC<Props> = ({ item }) => {
       newValue = item.balance.toFixed(2); // Полный баланс
     }
 
-    setInputValue(newValue); // Устанавливаем значение в input
+    setInputValue(newValue);
 
-    // Также обновляем calculatedValue с учетом курса
+    // Обновляем calculatedValue с учетом курса
     if (item.course && item.setCalculatedValue) {
       const calculatedValue = newValue
         ? (parseFloat(newValue) * item.course).toFixed(2)
         : "";
       item.setCalculatedValue(calculatedValue);
+    }
+
+    // Проверяем значение для setError
+    if (setError) {
+      setError(!newValue || parseFloat(newValue) === 0);
     }
   };
 

@@ -17,6 +17,7 @@ interface Props {
   fontSize?: string;
   fontWeight?: string;
   padding?: string;
+  disabled?: boolean;
 }
 
 const getHeightStyle = (height: ButtonHeight) =>
@@ -43,6 +44,7 @@ const Btn: React.FC<Props> = ({
   fontSize = "36",
   fontWeight = "400",
   padding,
+  disabled,
 }) => {
   const style = {
     height: getHeightStyle(height),
@@ -56,7 +58,7 @@ const Btn: React.FC<Props> = ({
     s.btn,
     {
       [s.default]: type !== "clear" && type,
-      [s.pink]: type == "pink",
+      [s.pink]: type == "pink" || disabled,
     },
     className
   );
