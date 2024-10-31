@@ -38,13 +38,13 @@ jobs:
           ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts
 
           ssh www@$SERVER_IP "
-            rm -rf /var/www/dist-old &&
-            mv /var/www/dist /var/www/dist-old
+            sudo rm -rf /var/www/dist-old &&
+            sudo mv /var/www/dist /var/www/dist-old
           "
           scp dist.tar.gz www@$SERVER_IP:/var/www
           ssh www@$SERVER_IP "
             cd /var/www &&
             tar -xzf dist.tar.gz &&
-            rm dist.tar.gz &&
+            sudo rm dist.tar.gz &&
             sudo systemctl restart nginx
           "
