@@ -1,0 +1,1 @@
+export const transfer = 0xf8a7ea5;
