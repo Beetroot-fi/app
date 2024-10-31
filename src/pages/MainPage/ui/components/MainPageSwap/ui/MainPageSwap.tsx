@@ -2,8 +2,9 @@ import { useState } from "react";
 import s from "../../../MainPage.module.scss";
 import { MainPageInputRow } from "../../MainPageInputRow";
 import Btn from "../../../../../../components/Btn/Btn";
+import { Props } from "../../../../../../types/mainPage";
 
-export const MainPageSwap = () => {
+export const MainPageSwap = ({ usdtBalance, rootBalance }: Props) => {
   const [calculatedValue, setCalculatedValue] = useState("");
   const [error, setError] = useState(true);
 
@@ -15,7 +16,7 @@ export const MainPageSwap = () => {
             img: "usdt-icon.png",
             name: "usdt",
             giveItAway: true,
-            balance: 339.34,
+            balance: usdtBalance,
             course: 0.01,
             setCalculatedValue: setCalculatedValue,
           }}
@@ -26,7 +27,7 @@ export const MainPageSwap = () => {
             img: "logo.png",
             name: "root",
             giveItAway: false,
-            balance: 10.55,
+            balance: rootBalance,
             disabled: true,
             calculatedValue: calculatedValue,
           }}

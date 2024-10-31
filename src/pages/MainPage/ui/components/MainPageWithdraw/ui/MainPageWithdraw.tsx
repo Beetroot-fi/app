@@ -2,10 +2,12 @@ import { useState } from "react";
 import s from "../../../MainPage.module.scss";
 import { MainPageInputRow } from "../../MainPageInputRow";
 import Btn from "../../../../../../components/Btn/Btn";
+import { Props } from "../../../../../../types/mainPage";
 
-export const MainPageWithdraw = () => {
+export const MainPageWithdraw = ({ usdtBalance, rootBalance }: Props) => {
   const [calculatedValue, setCalculatedValue] = useState("");
   const [error, setError] = useState(true);
+
   return (
     <div className={s.body}>
       <div className={s.block}>
@@ -14,7 +16,7 @@ export const MainPageWithdraw = () => {
             img: "logo.png",
             name: "root",
             giveItAway: true,
-            balance: 10.55,
+            balance: rootBalance,
             course: 100,
             setCalculatedValue: setCalculatedValue,
           }}
@@ -25,7 +27,7 @@ export const MainPageWithdraw = () => {
             img: "usdt-icon.png",
             name: "usdt",
             giveItAway: false,
-            balance: 339.34,
+            balance: usdtBalance,
             disabled: true,
             calculatedValue: calculatedValue,
           }}
