@@ -35,7 +35,13 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          echo "SSH key setup completed"
+
           ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts
+          echo "Added $SERVER_IP to known hosts"
+
+          echo "Testing SSH connection to server"
+          ssh -o StrictHostKeyChecking=no www@$SERVER_IP "echo 'SSH connection successful'"
 
           ssh www@$SERVER_IP "
             sudo rm -rf /var/www/dist-old &&
