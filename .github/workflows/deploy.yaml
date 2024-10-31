@@ -47,8 +47,8 @@ jobs:
 
           echo "Removing dist-old and renaming dist to dist-old on server"
           ssh -v www@$SERVER_IP "
-            sudo rm -rf /var/www/dist-old &&
-            sudo mv /var/www/dist /var/www/dist-old
+            sudo rm -rf ../../var/www/dist-old &&
+            sudo mv ../../var/www/dist /var/www/dist-old
           " || { echo "Failed to modify folders on server"; exit 1; }
 
           echo "Transferring dist.tar.gz to server"
@@ -56,7 +56,7 @@ jobs:
 
           echo "Deploying new dist and restarting Nginx"
           ssh -v www@$SERVER_IP "
-            cd /var/www &&
+            cd ../../var/www &&
             tar -xzf dist.tar.gz &&
             sudo rm dist.tar.gz &&
             sudo systemctl restart nginx
