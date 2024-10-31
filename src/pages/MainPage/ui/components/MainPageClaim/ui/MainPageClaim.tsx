@@ -8,12 +8,13 @@ export const MainPageClaim = () => {
       name: "root",
       giveItAway: true,
       balance: 10.55,
+      claimable: true,
     },
   ];
   return (
     <div className={s.block}>
       {rows.map((item, i) => (
-        <MainPageInputRow item={item} key={i} claimable />
+        <MainPageInputRow item={item} key={i} />
       ))}
     </div>
   );

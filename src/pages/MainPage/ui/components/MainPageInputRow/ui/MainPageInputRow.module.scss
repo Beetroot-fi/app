@@ -44,6 +44,18 @@
     height: 48px;
     margin-top: 8px;
 
+    p {
+        background: #F5B3BF;
+        border-radius: 12px;
+        padding: 0 12px;
+        font-weight: 400;
+        font-size: 32px;
+        line-height: 48px;
+        text-align: right;
+        color: rgba(176, 74, 92, 1);
+        width: 100%;
+    }
+
     input {
         background: #F5B3BF;
         border-radius: 12px;

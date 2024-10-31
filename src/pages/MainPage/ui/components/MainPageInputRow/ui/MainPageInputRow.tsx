@@ -8,14 +8,12 @@ interface Props {
     name: string;
     giveItAway: boolean;
     balance: number;
+    disabled?: boolean;
+    claimable?: boolean;
   };
-  claimable?: boolean;
 }
 
-export const MainPageInputRow: React.FC<Props> = ({
-  item,
-  claimable = false,
-}) => {
+export const MainPageInputRow: React.FC<Props> = ({ item }) => {
   const [currentTabNum, setCurrentTabNum] = useState<number | null>(null);
   const bottomTabs = ["25%", "50%", "max"];
   return (
@@ -28,11 +26,11 @@ export const MainPageInputRow: React.FC<Props> = ({
           <div className={s.token}>{item.name}</div>
         </div>
         <div className={s.top_r}>
-          {claimable ? "Claimable" : "Balance"}: {item.balance}
+          {item.claimable ? "Claimable" : "Balance"}: {item.balance}
         </div>
       </div>
       <div className={s.field}>
-        <input type="text" placeholder="1.00" />
+        {item.disabled ? <p>1.00</p> : <input type="text" placeholder="1.00" />}
       </div>
       {item.giveItAway && (
         <div className={s.bottom}>

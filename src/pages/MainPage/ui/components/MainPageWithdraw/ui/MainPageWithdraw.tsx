@@ -14,6 +14,7 @@ export const MainPageWithdraw = () => {
       name: "usdt",
       giveItAway: false,
       balance: 339.34,
+      disabled: true,
     },
   ];
   return (

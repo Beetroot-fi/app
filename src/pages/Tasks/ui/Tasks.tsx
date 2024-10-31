@@ -4,6 +4,7 @@ import s from "./Tasks.module.scss";
 import { useEffect, useState } from "react";
 import { apiService, TaskRead } from "../../../api";
 import { ThisInviteLinkIcon } from "../../../components/Icons/ThisInviteLinkIcon";
+import { Link } from "react-router-dom";
 
 export const Tasks = () => {
   const [tasks, setTasks] = useState<TaskRead[]>([]);
@@ -54,12 +55,12 @@ export const Tasks = () => {
         <div className={clsx(s.block_items, s.pink)}>
           {completedTasks.length > 0 ? (
             completedTasks.map((task, index) => (
-              <div className={s.block_item} key={index}>
+              <Link to={task.link} className={s.block_item} key={index}>
                 <div className={s.block_item_l}>{task.name}</div>
                 <div className={s.block_item_r}>
                   <ThisInviteLinkIcon />
                 </div>
-              </div>
+              </Link>
             ))
           ) : (
             <div className={s.no_referrals}>No completed tasks yet</div>

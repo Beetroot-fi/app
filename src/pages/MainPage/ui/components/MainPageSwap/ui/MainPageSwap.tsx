@@ -14,6 +14,7 @@ export const MainPageSwap = () => {
       name: "root",
       giveItAway: false,
       balance: 10.55,
+      disabled: true,
     },
   ];
   return (
