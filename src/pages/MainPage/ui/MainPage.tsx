@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import s from "./MainPage.module.scss";
-import Btn from "../../../components/Btn/Btn";
 import { useState } from "react";
 import { MainPageSwap } from "./components/MainPageSwap";
 import { MainPageWithdraw } from "./components/MainPageWithdraw";
