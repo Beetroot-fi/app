@@ -7,6 +7,8 @@ import { Props } from "../../../../../../types/mainPage";
 export const MainPageSwap = ({ usdtBalance, rootBalance }: Props) => {
   const [calculatedValue, setCalculatedValue] = useState("");
   const [error, setError] = useState(true);
+  const [usdtSwapValue, setUsdtSwapValue] = useState("");
+  const [rootSwapValue, setRootSwapValue] = useState("");
 
   return (
     <div className={s.body}>
@@ -20,6 +22,8 @@ export const MainPageSwap = ({ usdtBalance, rootBalance }: Props) => {
             course: 0.01,
             setCalculatedValue: setCalculatedValue,
           }}
+          inputValue={usdtSwapValue}
+          setInputValue={setUsdtSwapValue}
           setError={setError}
         />
         <MainPageInputRow
@@ -31,6 +35,8 @@ export const MainPageSwap = ({ usdtBalance, rootBalance }: Props) => {
             disabled: true,
             calculatedValue: calculatedValue,
           }}
+          inputValue={rootSwapValue}
+          setInputValue={setRootSwapValue}
         />
       </div>
       <Btn className={s.btn} disabled={error}>
