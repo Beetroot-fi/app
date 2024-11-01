@@ -1,14 +1,16 @@
 import clsx from "clsx";
 import s from "./MainPage.module.scss";
-import Btn from "../../../components/Btn/Btn";
 import { useState } from "react";
 import { MainPageSwap } from "./components/MainPageSwap";
 import { MainPageWithdraw } from "./components/MainPageWithdraw";
 import { MainPageClaim } from "./components/MainPageClaim";
+import { useJettonBalances } from "../../../hooks/useJettonBalances";
 
 export const MainPage = () => {
   const [currentTabNum, setCurrentTabNum] = useState(0);
   const tabs = ["Buy", "Withdraw", "Claim"];
+  const { usdtBalance, rootBalance } = useJettonBalances();
+
   return (
     <div className={s.wrapper}>
       <div className={s.tabs}>
@@ -21,9 +23,15 @@ export const MainPage = () => {
           </div>
         ))}
       </div>
-      {currentTabNum === 0 && <MainPageSwap />}
-      {currentTabNum === 1 && <MainPageWithdraw />}
-      {currentTabNum === 2 && <MainPageClaim />}
+      {currentTabNum === 0 && (
+        <MainPageSwap usdtBalance={usdtBalance} rootBalance={rootBalance} />
+      )}
+      {currentTabNum === 1 && (
+        <MainPageWithdraw usdtBalance={usdtBalance} rootBalance={rootBalance} />
+      )}
+      {currentTabNum === 2 && (
+        <MainPageClaim usdtBalance={usdtBalance} rootBalance={rootBalance} />
+      )}
       {currentTabNum !== 2 && (
         <div className={s.bottom}>
           <div className={s.bottom_l}>!!!</div>

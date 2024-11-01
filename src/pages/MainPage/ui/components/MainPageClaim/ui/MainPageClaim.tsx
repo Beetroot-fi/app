@@ -2,9 +2,11 @@ import { useState } from "react";
 import Btn from "../../../../../../components/Btn/Btn";
 import s from "../../../MainPage.module.scss";
 import { MainPageInputRow } from "../../MainPageInputRow";
+import { Props } from "../../../../../../types/mainPage";
 
-export const MainPageClaim = () => {
+export const MainPageClaim = ({ rootBalance }: Props) => {
   const [error, setError] = useState(true);
+
   return (
     <div className={s.body}>
       <div className={s.block}>
@@ -13,7 +15,7 @@ export const MainPageClaim = () => {
             img: "logo.png",
             name: "root",
             giveItAway: true,
-            balance: 10.55,
+            balance: rootBalance,
             claimable: true,
           }}
           setError={setError}
