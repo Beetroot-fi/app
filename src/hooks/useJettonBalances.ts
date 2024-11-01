@@ -40,7 +40,7 @@ export const useJettonBalances = () => {
     useEffect(() => {
         fetchBalances();
 
-        const intervalId = setInterval(fetchBalances, 20000);
+        const intervalId = setInterval(fetchBalances, 60000);
 
         return () => clearInterval(intervalId);
     }, [client, wallet]);
