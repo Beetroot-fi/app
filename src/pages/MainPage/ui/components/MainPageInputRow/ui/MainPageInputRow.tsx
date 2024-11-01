@@ -14,12 +14,19 @@ interface Props {
     calculatedValue?: string;
     setCalculatedValue?: React.Dispatch<React.SetStateAction<string>>;
   };
-  setError?: React.Dispatch<React.SetStateAction<boolean>>; // добавляем setError в пропсы
+  setError?: React.Dispatch<React.SetStateAction<boolean>>;
+  inputValue: string;
+  setInputValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const MainPageInputRow: React.FC<Props> = ({ item, setError }) => {
+export const MainPageInputRow: React.FC<Props> = ({
+  item,
+  setError,
+  inputValue,
+  setInputValue,
+}) => {
   const [currentTabNum, setCurrentTabNum] = useState<number | null>(null);
-  const [inputValue, setInputValue] = useState<string>("");
+  // const [inputValue, setInputValue] = useState<string>("");
 
   const bottomTabs = ["25%", "50%", "max"];
 

@@ -7,6 +7,8 @@ import { Props } from "../../../../../../types/mainPage";
 export const MainPageWithdraw = ({ usdtBalance, rootBalance }: Props) => {
   const [calculatedValue, setCalculatedValue] = useState("");
   const [error, setError] = useState(true);
+  const [usdtWithdrawValue, setUsdtWithdrawValue] = useState("");
+  const [rootWithdrawValue, setRootWithdrawValue] = useState("");
 
   return (
     <div className={s.body}>
@@ -21,6 +23,8 @@ export const MainPageWithdraw = ({ usdtBalance, rootBalance }: Props) => {
             setCalculatedValue: setCalculatedValue,
           }}
           setError={setError}
+          inputValue={usdtWithdrawValue}
+          setInputValue={setUsdtWithdrawValue}
         />
         <MainPageInputRow
           item={{
@@ -31,6 +35,8 @@ export const MainPageWithdraw = ({ usdtBalance, rootBalance }: Props) => {
             disabled: true,
             calculatedValue: calculatedValue,
           }}
+          inputValue={rootWithdrawValue}
+          setInputValue={setRootWithdrawValue}
         />
       </div>
       <Btn className={s.btn} disabled={error}>

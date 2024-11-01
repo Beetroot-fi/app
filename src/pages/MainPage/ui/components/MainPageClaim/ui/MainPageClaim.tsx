@@ -6,6 +6,7 @@ import { Props } from "../../../../../../types/mainPage";
 
 export const MainPageClaim = ({ rootBalance }: Props) => {
   const [error, setError] = useState(true);
+  const [rootSwapValue, setRootSwapValue] = useState("");
 
   return (
     <div className={s.body}>
@@ -19,6 +20,8 @@ export const MainPageClaim = ({ rootBalance }: Props) => {
             claimable: true,
           }}
           setError={setError}
+          inputValue={rootSwapValue}
+          setInputValue={setRootSwapValue}
         />
       </div>
       <Btn className={s.btn} disabled={error}>
