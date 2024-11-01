@@ -8,7 +8,7 @@ export default function useTonClient() {
         async () =>
             new TonClient({
                 endpoint: await getHttpEndpoint({ network: "testnet" }),
-                // apiKey: process.env.TONCENTER_API_KEY,
+                // apiKey: import.meta.env.VITE_TONCENTER_API_KEY,
             }),
     )
 }
