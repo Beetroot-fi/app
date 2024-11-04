@@ -13,6 +13,8 @@ import {
 
 export const useJettonBalances = () => {
   const [usdtBalance, setUsdtBalance] = useState(0);
+  const [usdtJettonWalletAddress, setUsdtJettonWalletAddress] = useState("");
+  const [rootJettonWalletAddress, setRootJettonWalletAddress] = useState("");
   const [rootBalance, setRootBalance] = useState(0);
   const client = useTonClient();
   const wallet = useTonWallet();
@@ -28,12 +30,14 @@ export const useJettonBalances = () => {
         Address.parseRaw(wallet.account.address),
         Address.parse(USDT_JETTON_MASTER_ADDRESS)
       );
+      setUsdtJettonWalletAddress(usdtJettonWalletAddress.toString());
 
       const rootJettonWalletAddress = await getJettonWalletAddress(
         client,
         Address.parseRaw(wallet.account.address),
         Address.parse(BEETROOT_JETTON_MASTER_ADDRESS)
       );
+      setRootJettonWalletAddress(rootJettonWalletAddress.toString());
 
       const usdtData = await getJettonWalletData(
         client,
@@ -64,5 +68,5 @@ export const useJettonBalances = () => {
     }
   }, [client, wallet]);
 
-  return { usdtBalance, rootBalance };
+  return { usdtBalance, usdtJettonWalletAddress, rootBalance, rootJettonWalletAddress };
 };
