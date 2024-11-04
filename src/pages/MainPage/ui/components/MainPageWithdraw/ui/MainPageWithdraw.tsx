@@ -6,6 +6,7 @@ import { Props } from "../../../../../../types/mainPage";
 import {
   buildWithdrawBody,
   getUserScAddress,
+  getUserScData,
 } from "../../../../../../methods/user";
 import useTonClient from "../../../../../../hooks/useTonClient";
 import { useTonWallet, useTonConnectUI } from "@tonconnect/ui-react";
@@ -17,6 +18,7 @@ export const MainPageWithdraw = ({ usdtBalance, rootBalance }: Props) => {
   const [usdtWithdrawValue, setUsdtWithdrawValue] = useState("");
   const [rootWithdrawValue, setRootWithdrawValue] = useState("");
   const [userScAddress, setUserScAddress] = useState("");
+  const [profit, setProfit] = useState(0);
   const client = useTonClient();
   const wallet = useTonWallet();
   const [tonConnectUI] = useTonConnectUI();
@@ -24,14 +26,29 @@ export const MainPageWithdraw = ({ usdtBalance, rootBalance }: Props) => {
   useEffect(() => {
     if (!client || !wallet?.account.address) return;
 
-    const setAddress = async () => {
+    const fetchData = async () => {
       const userScAddress = await getUserScAddress(
         client,
         Address.parseRaw(wallet.account.address)
       );
       setUserScAddress(userScAddress.toString());
+
+      const { depositTimestamp, balance } = await getUserScData(
+        client,
+        userScAddress
+      );
+
+      const currentTimestamp = Math.floor(Date.now() / 1000);
+      const depositTime = Number(depositTimestamp.toString().replace("n", ""));
+      const timeDiffSeconds = currentTimestamp - depositTime;
+      const timeDiffYears = timeDiffSeconds / (365.25 * 24 * 60 * 60);
+      const currentValue =
+        Number(balance) * Math.pow(1 + 15 / 100, timeDiffYears);
+
+      const profit = (currentValue - Number(balance)) / 1e6;
+      setProfit(Number(profit.toFixed(2)));
     };
-    setAddress();
+    fetchData();
   }, [client, wallet, usdtWithdrawValue]);
 
   return (
@@ -57,7 +74,7 @@ export const MainPageWithdraw = ({ usdtBalance, rootBalance }: Props) => {
             giveItAway: false,
             balance: usdtBalance,
             disabled: true,
-            calculatedValue: calculatedValue,
+            calculatedValue: String(Number(calculatedValue) + profit),
           }}
           inputValue={rootWithdrawValue}
           setInputValue={setRootWithdrawValue}
