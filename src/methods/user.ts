@@ -17,3 +17,8 @@ export async function getUserScAddress(client: TonClient, userAddress: Address) 
     )
     return result.stack.readAddress();
 }
+
+export async function getUnlockTimestamp(client: TonClient, userScAddress: Address) {
+    const result = await client.runMethod(userScAddress, "get_unlock_timestamp", [])
+    return result.stack.readBigNumber();
+}
