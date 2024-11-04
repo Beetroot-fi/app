@@ -22,3 +22,16 @@ export async function getUnlockTimestamp(client: TonClient, userScAddress: Addre
     const result = await client.runMethod(userScAddress, "get_unlock_timestamp", [])
     return result.stack.readBigNumber();
 }
+
+export async function getUserScData(client: TonClient, userScAddress: Address) {
+    const result = await client.runMethod(userScAddress, "get_user_data", [])
+    return {
+        depositTimestamp: result.stack.readBigNumber(),
+        unlockTimestamp: result.stack.readBigNumber(),
+        adminAddress: result.stack.readAddress(),
+        balance: result.stack.readBigNumber(),
+        mainScAddress: result.stack.readAddress(),
+        rootMasterAddress: result.stack.readAddress(),
+        jettonWalletCode: result.stack.readCell(),
+    };
+}
