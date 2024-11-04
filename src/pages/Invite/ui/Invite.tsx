@@ -19,7 +19,6 @@ export const Invite = () => {
         const userData = (await apiService.getUser()).data;
         setUserData(userData);
       } catch (error) {
-        console.error("Error fetching:", error);
       } finally {
         setLoading(false);
       }
@@ -33,7 +32,6 @@ export const Invite = () => {
   const handleInviteClick = () => {
     try {
       if (!window.Telegram?.WebApp) {
-        console.error("Telegram WebApp is not available");
         return;
       }
 
@@ -45,9 +43,7 @@ export const Invite = () => {
           refLink
         )}&text=${encodeURIComponent(captionText)}`
       );
-    } catch (error) {
-      console.error("Error sharing:", error);
-    }
+    } catch (error) {}
   };
 
   return (

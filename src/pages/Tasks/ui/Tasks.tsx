@@ -21,7 +21,6 @@ export const Tasks = () => {
         const completedTasks = (await apiService.getCompletedTasks()).data;
         setCompletedTasks(completedTasks);
       } catch (error) {
-        console.error("Error fetching:", error);
       } finally {
         setLoading(false);
       }
@@ -41,9 +40,7 @@ export const Tasks = () => {
 
       const updatedCompletedTasks = (await apiService.getCompletedTasks()).data;
       setCompletedTasks(updatedCompletedTasks);
-    } catch (error) {
-      console.error("Failed to complete task:", error);
-    }
+    } catch (error) {}
   };
 
   const completedTaskIds = new Set(completedTasks.map((task) => task.task_id));

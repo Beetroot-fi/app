@@ -112,7 +112,6 @@ export const apiService = {
 
             return response.data;
         } catch (error) {
-            console.error('Login error:', error);
             throw error;
         }
     },
@@ -121,7 +120,6 @@ export const apiService = {
         try {
             return await refreshAuthTokens();
         } catch (error) {
-            console.error('Token refresh error:', error);
             throw error;
         }
     },
@@ -131,7 +129,6 @@ export const apiService = {
             const response = await api.get<UserRead>('/api/v1/users/');
             return response;
         } catch (error) {
-            console.error('Failed to fetch user data:', error)
             throw error;
         }
     },
@@ -141,7 +138,6 @@ export const apiService = {
             const response = await api.get<UserRead[]>('/api/v1/users/referrals');
             return response;
         } catch (error) {
-            console.error('Failed to fetch user referrals:', error)
             throw error;
         }
     },
@@ -151,7 +147,6 @@ export const apiService = {
             const response = await api.get<TaskRead[]>('/api/v1/tasks');
             return response;
         } catch (error) {
-            console.error('Failed to fetch tasks:', error)
             throw error;
         }
     },
@@ -161,7 +156,6 @@ export const apiService = {
             const response = await api.get<TaskRead[]>('/api/v1/tasks/completed');
             return response;
         } catch (error) {
-            console.error('Failed to fetch completed tasks:', error)
             throw error;
         }
     },
@@ -171,7 +165,6 @@ export const apiService = {
             const response = await api.post(`/api/v1/tasks/complete?task_id=${taskId}`);
             return response;
         } catch (error) {
-            console.error('Failed to complete task:', error)
             throw error;
         }
     }
