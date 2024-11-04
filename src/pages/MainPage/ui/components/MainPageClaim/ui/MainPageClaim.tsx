@@ -14,32 +14,34 @@ export const MainPageClaim = ({ rootBalance, rootJettonWallet }: Props) => {
   const [rootSwapValue, setRootSwapValue] = useState("");
   const [transferBody, setTransferBody] = useState("");
   const [tonConnectUI] = useTonConnectUI();
-  const [userScAddress, setUserScAddress] = useState("");
   const client = useTonClient();
   const wallet = useTonWallet();
 
   useEffect(() => {
-    if (!client || !wallet?.account.address) return;
+    if (!client || !wallet?.account.address || !rootSwapValue) return;
 
     const setAddress = async () => {
       const userScAddress = await getUserScAddress(
         client,
         Address.parseRaw(wallet.account.address)
       );
-      setUserScAddress(userScAddress.toString());
-    };
-    setAddress();
 
-    const transferBody = buildJettonTransferBody(
-      0n,
-      BigInt(rootSwapValue) * BigInt(1e6),
-      Address.parse(userScAddress),
-      Address.parseRaw(wallet.account.address),
-      null,
-      toNano("0.3"),
-      null
-    );
-    setTransferBody(transferBody.toBoc().toString("base64"));
+      if (isNaN(Number(rootSwapValue)) || !userScAddress) return;
+
+      const transferBody = buildJettonTransferBody(
+        0n,
+        BigInt(parseInt(rootSwapValue)) * BigInt(1e6),
+        userScAddress,
+        Address.parseRaw(wallet.account.address),
+        null,
+        toNano("0.3"),
+        null
+      );
+
+      setTransferBody(transferBody.toBoc().toString("base64"));
+    };
+
+    setAddress();
   }, [client, wallet, rootSwapValue]);
 
   return (

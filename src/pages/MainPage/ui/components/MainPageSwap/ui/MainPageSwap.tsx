@@ -26,16 +26,22 @@ export const MainPageSwap = ({
   useEffect(() => {
     if (!client || !wallet?.account.address) return;
 
-    const transferBody = buildJettonTransferBody(
-      0n,
-      BigInt(usdtSwapValue) * BigInt(1e6),
-      Address.parse(MAIN_SC_ADDRESS),
-      Address.parseRaw(wallet.account.address),
-      null,
-      toNano("0.3"),
-      null
-    );
-    setTransferBody(transferBody.toBoc().toString("base64"));
+    try {
+      const parsedSwapValue = BigInt(parseInt(usdtSwapValue)) * BigInt(1e6);
+      const transferBody = buildJettonTransferBody(
+        0n,
+        parsedSwapValue,
+        Address.parse(MAIN_SC_ADDRESS),
+        Address.parseRaw(wallet.account.address),
+        null,
+        toNano("0.3"),
+        null
+      );
+
+      setTransferBody(transferBody.toBoc().toString("base64"));
+    } catch (error) {
+      setTransferBody("");
+    }
   }, [client, wallet, usdtSwapValue]);
 
   return (
