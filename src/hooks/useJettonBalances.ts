@@ -20,8 +20,6 @@ export const useJettonBalances = () => {
   const wallet = useTonWallet();
 
   const fetchBalances = async () => {
-    const date = Date.now();
-    localStorage.setItem("last-balance-fetching", String(date));
     if (!client || !wallet?.account?.address) return;
 
     try {
@@ -56,16 +54,7 @@ export const useJettonBalances = () => {
   };
 
   useEffect(() => {
-    const date = Date.now();
-
-    if (!localStorage.getItem("last-balance-fetching")) {
-      fetchBalances();
-      return;
-    }
-
-    if (date - Number(localStorage.getItem("last-balance-fetching")) > 60000) {
-      fetchBalances();
-    }
+    fetchBalances();
   }, [client, wallet]);
 
   return { usdtBalance, usdtJettonWalletAddress, rootBalance, rootJettonWalletAddress };
