@@ -5,23 +5,20 @@ import Btn from "../../../../../../components/Btn/Btn";
 import { Props } from "../../../../../../types/mainPage";
 import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
 import useTonClient from "../../../../../../hooks/useTonClient";
-import {
-  buildJettonTransferBody,
-  getJettonWalletAddress,
-} from "../../../../../../methods/jettonUtils";
-import {
-  MAIN_SC_ADDRESS,
-  USDT_JETTON_MASTER_ADDRESS,
-} from "../../../../../../consts";
+import { buildJettonTransferBody } from "../../../../../../methods/jettonUtils";
+import { MAIN_SC_ADDRESS } from "../../../../../../consts";
 import { Address, toNano } from "@ton/core";
 
-export const MainPageSwap = ({ usdtBalance, rootBalance }: Props) => {
+export const MainPageSwap = ({
+  usdtBalance,
+  rootBalance,
+  usdtJettonWallet,
+}: Props) => {
   const [calculatedValue, setCalculatedValue] = useState("");
   const [error, setError] = useState(true);
   const [usdtSwapValue, setUsdtSwapValue] = useState("");
   const [rootSwapValue, setRootSwapValue] = useState("");
   const [transferBody, setTransferBody] = useState("");
-  const [usdtJettonWallet, setUsdtJettonWallet] = useState("");
   const [tonConnectUI] = useTonConnectUI();
   const client = useTonClient();
   const wallet = useTonWallet();
@@ -39,16 +36,6 @@ export const MainPageSwap = ({ usdtBalance, rootBalance }: Props) => {
       null
     );
     setTransferBody(transferBody.toBoc().toString("base64"));
-
-    const getUsdtJettonWallet = async () => {
-      let usdtJettonWallet = await getJettonWalletAddress(
-        client,
-        Address.parseRaw(wallet.account.address),
-        Address.parse(USDT_JETTON_MASTER_ADDRESS)
-      );
-      setUsdtJettonWallet(usdtJettonWallet.toString());
-    };
-    getUsdtJettonWallet();
   }, [client, wallet, usdtSwapValue]);
 
   return (

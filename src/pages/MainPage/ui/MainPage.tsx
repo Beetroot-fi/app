@@ -9,7 +9,12 @@ import { useJettonBalances } from "../../../hooks/useJettonBalances";
 export const MainPage = () => {
   const [currentTabNum, setCurrentTabNum] = useState(0);
   const tabs = ["Buy", "Withdraw", "Claim"];
-  const { usdtBalance, rootBalance } = useJettonBalances();
+  const {
+    usdtBalance,
+    usdtJettonWalletAddress,
+    rootBalance,
+    rootJettonWalletAddress,
+  } = useJettonBalances();
 
   return (
     <div className={s.wrapper}>
@@ -24,13 +29,28 @@ export const MainPage = () => {
         ))}
       </div>
       {currentTabNum === 0 && (
-        <MainPageSwap usdtBalance={usdtBalance} rootBalance={rootBalance} />
+        <MainPageSwap
+          usdtBalance={usdtBalance}
+          rootBalance={rootBalance}
+          usdtJettonWallet={usdtJettonWalletAddress}
+          rootJettonWallet={rootJettonWalletAddress}
+        />
       )}
       {currentTabNum === 1 && (
-        <MainPageWithdraw usdtBalance={usdtBalance} rootBalance={rootBalance} />
+        <MainPageWithdraw
+          usdtBalance={usdtBalance}
+          rootBalance={rootBalance}
+          usdtJettonWallet={usdtJettonWalletAddress}
+          rootJettonWallet={rootJettonWalletAddress}
+        />
       )}
       {currentTabNum === 2 && (
-        <MainPageClaim usdtBalance={usdtBalance} rootBalance={rootBalance} />
+        <MainPageClaim
+          usdtBalance={usdtBalance}
+          rootBalance={rootBalance}
+          usdtJettonWallet={usdtJettonWalletAddress}
+          rootJettonWallet={rootJettonWalletAddress}
+        />
       )}
       {currentTabNum !== 2 && (
         <div className={s.bottom}>

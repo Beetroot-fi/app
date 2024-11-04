@@ -23,6 +23,7 @@ export const MainPageWithdraw = ({ usdtBalance, rootBalance }: Props) => {
 
   useEffect(() => {
     if (!client || !wallet?.account.address) return;
+
     const setAddress = async () => {
       const userScAddress = await getUserScAddress(
         client,

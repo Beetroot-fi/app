@@ -5,19 +5,14 @@ import { MainPageInputRow } from "../../MainPageInputRow";
 import { Props } from "../../../../../../types/mainPage";
 import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
 import useTonClient from "../../../../../../hooks/useTonClient";
-import {
-  buildJettonTransferBody,
-  getJettonWalletAddress,
-} from "../../../../../../methods/jettonUtils";
+import { buildJettonTransferBody } from "../../../../../../methods/jettonUtils";
 import { getUserScAddress } from "../../../../../../methods/user";
 import { Address, toNano } from "@ton/core";
-import { BEETROOT_JETTON_MASTER_ADDRESS } from "../../../../../../consts";
 
-export const MainPageClaim = ({ rootBalance }: Props) => {
+export const MainPageClaim = ({ rootBalance, rootJettonWallet }: Props) => {
   const [error, setError] = useState(true);
   const [rootSwapValue, setRootSwapValue] = useState("");
   const [transferBody, setTransferBody] = useState("");
-  const [rootJettonWallet, setRootJettonWallet] = useState("");
   const [tonConnectUI] = useTonConnectUI();
   const [userScAddress, setUserScAddress] = useState("");
   const client = useTonClient();
@@ -45,16 +40,6 @@ export const MainPageClaim = ({ rootBalance }: Props) => {
       null
     );
     setTransferBody(transferBody.toBoc().toString("base64"));
-
-    const getRootJettonWallet = async () => {
-      let usdtJettonWallet = await getJettonWalletAddress(
-        client,
-        Address.parseRaw(wallet.account.address),
-        Address.parse(BEETROOT_JETTON_MASTER_ADDRESS)
-      );
-      setRootJettonWallet(usdtJettonWallet.toString());
-    };
-    getRootJettonWallet();
   }, [client, wallet, rootSwapValue]);
 
   return (
