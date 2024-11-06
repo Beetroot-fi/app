@@ -1,4 +1,5 @@
 export const BEETROOT_JETTON_MASTER_ADDRESS = "kQBmoTop10QC3NIk1U0mkseggLCsjCaiDGjXwajprwiDG1PA";
 export const USDT_JETTON_MASTER_ADDRESS = "kQBxPxYRD9IOrnIEQysG7D9enWnxg8AGx-wUdcA55mxaKdTK";
 export const MAIN_SC_ADDRESS = "kQDKUeeaklszSCSLwRYzH1wf6ExySd2-GSE3B9Nzo0VXBe66";
+export const ADMIN_ADDRESS = "0QDYQBKNXwHVOD6Ucw7zXLrbQi9d7VngoFfG3xIYOG_0-tQS";
 export const TESTNET_CHAIN_ID = "-3";
