@@ -49,7 +49,7 @@ export const useJettonBalances = () => {
       setUsdtBalance(Number(usdtData.balance / BigInt(1e6)));
       setRootBalance(Number(fromNano(rootData.balance)));
     } catch (error) {
-
+      console.error('Error to fetch balances', error)
     }
   };
 
