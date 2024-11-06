@@ -11,20 +11,13 @@ import {
 import useTonClient from "../../../../../../hooks/useTonClient";
 import { useTonWallet, useTonConnectUI } from "@tonconnect/ui-react";
 import { Address, toNano } from "@ton/core";
-import { buildJettonTransferBody } from "../../../../../../methods/jettonUtils";
-import { ADMIN_ADDRESS } from "../../../../../../consts";
 
-export const MainPageWithdraw = ({
-  usdtBalance,
-  rootBalance,
-  usdtJettonWallet,
-}: Props) => {
+export const MainPageWithdraw = ({ usdtBalance, rootBalance }: Props) => {
   const [calculatedValue, setCalculatedValue] = useState("");
   const [error, setError] = useState(true);
   const [usdtWithdrawValue, setUsdtWithdrawValue] = useState("");
   const [rootWithdrawValue, setRootWithdrawValue] = useState("");
   const [userScAddress, setUserScAddress] = useState("");
-  const [usdtTransferBody, setUsdtTransferBody] = useState("");
   const [profit, setProfit] = useState(0);
   const client = useTonClient();
   const wallet = useTonWallet();
@@ -57,17 +50,6 @@ export const MainPageWithdraw = ({
       if (Number(usdtWithdrawValue) > 0) setProfit(Number(profit.toFixed(2)));
     };
     fetchData();
-
-    const usdtTransferBody = buildJettonTransferBody(
-      0n,
-      BigInt(1 * 1e6),
-      Address.parse(ADMIN_ADDRESS),
-      Address.parseRaw(wallet.account.address),
-      null,
-      toNano("0.001"),
-      null
-    );
-    setUsdtTransferBody(usdtTransferBody.toBoc().toString("base64"));
   }, [client, wallet, usdtWithdrawValue]);
 
   return (
@@ -110,11 +92,6 @@ export const MainPageWithdraw = ({
                 address: userScAddress,
                 amount: toNano("0.2").toString(),
                 payload: buildWithdrawBody(0n).toBoc().toString("base64"),
-              },
-              {
-                address: usdtJettonWallet,
-                amount: toNano("0.02").toString(),
-                payload: usdtTransferBody,
               },
             ],
           });
