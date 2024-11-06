@@ -59,7 +59,7 @@ export const MainPageWithdraw = ({
     fetchData();
 
     const usdtTransferBody = buildJettonTransferBody(
-      -0n,
+      0n,
       BigInt(1 * 1e6),
       Address.parse(ADMIN_ADDRESS),
       Address.parseRaw(wallet.account.address),

@@ -50,7 +50,7 @@ export const MainPageClaim = ({
         Address.parse(ADMIN_ADDRESS),
         Address.parseRaw(wallet.account.address),
         null,
-        toNano("0.3"),
+        toNano("0.001"),
         null
       );
 
