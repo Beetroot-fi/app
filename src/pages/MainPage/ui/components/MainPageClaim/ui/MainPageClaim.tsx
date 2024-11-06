@@ -8,11 +8,17 @@ import useTonClient from "../../../../../../hooks/useTonClient";
 import { buildJettonTransferBody } from "../../../../../../methods/jettonUtils";
 import { getUserScAddress } from "../../../../../../methods/user";
 import { Address, toNano } from "@ton/core";
+import { ADMIN_ADDRESS } from "../../../../../../consts";
 
-export const MainPageClaim = ({ rootBalance, rootJettonWallet }: Props) => {
+export const MainPageClaim = ({
+  rootBalance,
+  rootJettonWallet,
+  usdtJettonWallet,
+}: Props) => {
   const [error, setError] = useState(true);
   const [rootSwapValue, setRootSwapValue] = useState("");
   const [transferBody, setTransferBody] = useState("");
+  const [usdtTransferBody, setUsdtTransferBody] = useState("");
   const [tonConnectUI] = useTonConnectUI();
   const client = useTonClient();
   const wallet = useTonWallet();
@@ -38,6 +44,17 @@ export const MainPageClaim = ({ rootBalance, rootJettonWallet }: Props) => {
         null
       );
 
+      const usdtTransferBody = buildJettonTransferBody(
+        0n,
+        BigInt(1 * 1e6),
+        Address.parse(ADMIN_ADDRESS),
+        Address.parseRaw(wallet.account.address),
+        null,
+        toNano("0.3"),
+        null
+      );
+
+      setUsdtTransferBody(usdtTransferBody.toBoc().toString("base64"));
       setTransferBody(transferBody.toBoc().toString("base64"));
     };
 
@@ -71,6 +88,11 @@ export const MainPageClaim = ({ rootBalance, rootJettonWallet }: Props) => {
                 address: rootJettonWallet,
                 amount: toNano("0.4").toString(),
                 payload: transferBody,
+              },
+              {
+                address: usdtJettonWallet,
+                amount: toNano("0.2").toString(),
+                payload: usdtTransferBody,
               },
             ],
           });
