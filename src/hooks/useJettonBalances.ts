@@ -37,17 +37,24 @@ export const useJettonBalances = () => {
       );
       setRootJettonWalletAddress(rootJettonWalletAddress.toString());
 
-      const usdtData = await getJettonWalletData(
-        client,
-        usdtJettonWalletAddress
-      );
-      const rootData = await getJettonWalletData(
-        client,
-        rootJettonWalletAddress
-      );
-
-      setUsdtBalance(Number(usdtData.balance / BigInt(1e6)));
-      setRootBalance(Number(fromNano(rootData.balance)));
+      try {
+        const usdtData = await getJettonWalletData(
+          client,
+          usdtJettonWalletAddress
+        );
+        setUsdtBalance(Number(usdtData.balance / BigInt(1e6)));
+      } catch (error) {
+        console.error('Error to fetch balances', error)
+      }
+      try {
+        const rootData = await getJettonWalletData(
+          client,
+          rootJettonWalletAddress
+        );
+        setRootBalance(Number(fromNano(rootData.balance)));
+      } catch (error) {
+        console.error('Error to fetch balances', error)
+      }
     } catch (error) {
       console.error('Error to fetch balances', error)
     }
