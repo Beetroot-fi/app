@@ -70,14 +70,16 @@ export const HomePageTop = () => {
           className={s.btn}
           disabled={error || !usdtJettonWallet}
           onClick={() => {
-            usdtJettonWallet?.transfer(
-              toNano("0.4"),
-              0,
-              Address.parse(MAIN_SC_ADDRESS),
-              BigInt(usdtSwapValue) * BigInt(1e6),
-              toNano("0.3"),
-              beginCell().endCell()
-            );
+            if (!(error || !usdtJettonWallet)) {
+              usdtJettonWallet?.transfer(
+                toNano("0.4"),
+                0,
+                Address.parse(MAIN_SC_ADDRESS),
+                BigInt(usdtSwapValue) * BigInt(1e6),
+                toNano("0.3"),
+                beginCell().endCell()
+              );
+            }
           }}
         >
           Swap
