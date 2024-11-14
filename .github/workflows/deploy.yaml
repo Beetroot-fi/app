@@ -1,99 +1,43 @@
-name: Deploy to Server
+name: App CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
 
-      - name: Setup Node.js
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20"
+          node-version: "18"
+          cache: "npm"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
 
       - name: Build project
         run: npm run build
 
-      - name: Archive dist folder
-        run: tar -czf dist.tar.gz dist
-
-      - name: Install SSH dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y expect sshpass
-
-      - name: Prepare SSH
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-          SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
-        run: |
-          mkdir -p ~/.ssh
-          echo -e "$SSH_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
-          cat > /tmp/add_ssh_key.exp <<EOL
-          #!/usr/bin/expect -f
-          set timeout -1
-          spawn ssh-add ~/.ssh/id_ed25519
-          expect {
-            "Enter passphrase" {
-              send "$env(SSH_PASSPHRASE)\r"
-              expect eof
-            }
-            eof
-          }
-          EOL
-
-          chmod +x /tmp/add_ssh_key.exp
-          eval "$(ssh-agent -s)"
-          /usr/bin/expect /tmp/add_ssh_key.exp
-
-      - name: Deploy to Server
-        env:
-          SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
-          SERVER_IP: ${{ secrets.SERVER_IP }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-        run: |
-          ssh-keyscan -p "$SSH_PORT" -H "$SERVER_IP" >> ~/.ssh/known_hosts
-
-          /usr/bin/expect <<EOL
-          spawn ssh -p $SSH_PORT -i ~/.ssh/id_ed25519 www@$SERVER_IP "
-            cd /var/www &&
-            sudo rm -rf dist-old &&
-            sudo mv dist dist-old 2>/dev/null || true
-          "
-          expect {
-            "Enter passphrase" {
-              send "$env(SSH_PASSPHRASE)\r"
-              expect eof
-            }
-            eof
-          }
-          EOL
-
-          scp -P "$SSH_PORT" -o StrictHostKeyChecking=no dist.tar.gz www@$SERVER_IP:/var/www
-
-          /usr/bin/expect <<EOL
-          spawn ssh -p $SSH_PORT -i ~/.ssh/id_ed25519 www@$SERVER_IP "
-            cd /var/www &&
-            tar -xzf dist.tar.gz &&
-            rm dist.tar.gz &&
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{secrets.SSH_PORT}}
+          script: |
+            cd /app
+            git pull origin main
+            npm ci
+            npm run build
             sudo systemctl restart nginx
-          "
-          expect {
-            "Enter passphrase" {
-              send "$env(SSH_PASSPHRASE)\r"
-              expect eof
-            }
-            eof
-          }
-          EOL
