@@ -34,8 +34,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{secrets.SSH_PORT}}
           script: |
-            cd /app
+            cd app
             git pull origin main
-            npm ci
             npm run build
-            sudo systemctl restart nginx
+            systemctl restart nginx
