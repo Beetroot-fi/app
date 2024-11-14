@@ -1,46 +1,38 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Btn from "../../../../../../components/Btn/Btn";
 import { HomePageField } from "../../HomePageSwapField/ui/HomePageSwapField";
 import s from "./HomePageTop.module.scss";
-import { useJettonBalances } from "../../../../../../hooks/useJettonBalances";
-import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
-import { Address, toNano } from "@ton/core";
-import useTonClient from "../../../../../../hooks/useTonClient";
-import { buildJettonTransferBody } from "../../../../../../methods/jettonUtils";
-import { MAIN_SC_ADDRESS } from "../../../../../../consts";
+import { Address, beginCell, toNano } from "@ton/core";
+import {
+  BEETROOT_JETTON_MASTER_ADDRESS,
+  MAIN_SC_ADDRESS,
+  USDT_JETTON_MASTER_ADDRESS,
+} from "../../../../../../consts";
 import { DblArrowIcon } from "../../../../../../components/Icons/DblArrowIcon";
+import useJettonWallet from "../../../../../../hooks/useJettonWallet";
+import { useTonWallet } from "@tonconnect/ui-react";
 
 export const HomePageTop = () => {
+  const wallet = useTonWallet();
   const [calculatedValue, setCalculatedValue] = useState("");
   const [error, setError] = useState(true);
   const [usdtSwapValue, setUsdtSwapValue] = useState("");
   const [rootSwapValue, setRootSwapValue] = useState("");
-  const [transferBody, setTransferBody] = useState("");
-  const [tonConnectUI] = useTonConnectUI();
-  const client = useTonClient();
-  const wallet = useTonWallet();
-  useEffect(() => {
-    if (!client || !wallet?.account.address) return;
 
-    try {
-      const parsedSwapValue = BigInt(parseInt(usdtSwapValue)) * BigInt(1e6);
-      const transferBody = buildJettonTransferBody(
-        0n,
-        parsedSwapValue,
-        Address.parse(MAIN_SC_ADDRESS),
-        Address.parseRaw(wallet.account.address),
-        null,
-        toNano("0.3"),
-        null
-      );
+  const ownerAddress = wallet?.account.address
+    ? Address.parseRaw(wallet.account.address)
+    : null;
 
-      setTransferBody(transferBody.toBoc().toString("base64"));
-    } catch (error) {
-      setTransferBody("");
-    }
-  }, [client, wallet, usdtSwapValue]);
-  const { usdtBalance, usdtJettonWalletAddress, rootBalance } =
-    useJettonBalances();
+  const usdtJettonWallet = useJettonWallet({
+    ownerAddress: ownerAddress as Address,
+    jettonMasterAddress: Address.parse(USDT_JETTON_MASTER_ADDRESS),
+  });
+
+  const beetrootJettonWallet = useJettonWallet({
+    ownerAddress: ownerAddress as Address,
+    jettonMasterAddress: Address.parse(BEETROOT_JETTON_MASTER_ADDRESS),
+  });
+
   return (
     <div className={s.wrapper}>
       <div className={s.swap}>
@@ -49,7 +41,7 @@ export const HomePageTop = () => {
             img: "usdt-icon.png",
             name: "usdt",
             giveItAway: true,
-            balance: usdtBalance,
+            balance: Number(usdtJettonWallet?.balance / 1e6) ?? 0,
             course: 0.01,
             setCalculatedValue: setCalculatedValue,
           }}
@@ -65,7 +57,7 @@ export const HomePageTop = () => {
             img: "root-icon.png",
             name: "root",
             giveItAway: false,
-            balance: rootBalance,
+            balance: Number(beetrootJettonWallet?.balance / 1e9) ?? 0,
             disabled: true,
             calculatedValue: calculatedValue,
           }}
@@ -76,18 +68,16 @@ export const HomePageTop = () => {
       <div className={s.btn}>
         <Btn
           className={s.btn}
-          disabled={error}
+          disabled={error || !usdtJettonWallet}
           onClick={() => {
-            tonConnectUI.sendTransaction({
-              validUntil: Date.now() + 5 * 60 * 1000,
-              messages: [
-                {
-                  address: usdtJettonWalletAddress,
-                  amount: toNano("0.4").toString(),
-                  payload: transferBody,
-                },
-              ],
-            });
+            usdtJettonWallet?.transfer(
+              toNano("0.4"),
+              0,
+              Address.parse(MAIN_SC_ADDRESS),
+              BigInt(usdtSwapValue) * BigInt(1e6),
+              toNano("0.3"),
+              beginCell().endCell()
+            );
           }}
         >
           Swap
@@ -99,7 +89,7 @@ export const HomePageTop = () => {
       </div>
       <div className={s.roots}>
         <div className={s.root}>
-          <p>ROOT PRicE</p>
+          <p>ROOT PRICE</p>
           <p>$100.00</p>
         </div>
         <div className={s.root}>
