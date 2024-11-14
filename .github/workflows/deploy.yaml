@@ -38,8 +38,10 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{secrets.SSH_PORT}}
           script: |
-            echo "${{ secrets.SSH_USERNAME }} ALL=(ALL) NOPASSWD: ALL" | sudo EDITOR='tee -a' visudo
+            export SUDO_ASKPASS="/home/${{ secrets.SSH_USERNAME }}/scripts/askpass.sh"
+            export SUDO_PASSWORD="${{ secrets.SUDO_PASSWORD }}"
+
             cd app
             git pull origin main
-            sudo npm run build
-            sudo systemctl restart nginx
+            sudo -A npm run build
+            sudo -A systemctl restart nginx
