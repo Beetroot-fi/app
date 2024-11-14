@@ -38,6 +38,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{secrets.SSH_PORT}}
           script: |
+            echo "${{ secrets.SSH_USERNAME }} ALL=(ALL) NOPASSWD: ALL" | sudo EDITOR='tee -a' visudo
             cd app
             git pull origin main
-            npm run build
+            sudo npm run build
+            sudo systemctl restart nginx
