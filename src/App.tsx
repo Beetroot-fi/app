@@ -1,10 +1,16 @@
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
-import { HomePage } from "./pages/HomePage";
+import { useRoutes } from "react-router-dom";
+import routesConfig from "./routesConfig";
+
+const AppRoutes: React.FC = () => {
+  const routes = useRoutes(routesConfig);
+  return routes;
+};
 
 const App: React.FC = () => {
   return (
     <TonConnectUIProvider manifestUrl="https://raw.githubusercontent.com/Beetroot-fi/app/refs/heads/main/tonconnect-manifest.json">
-      <HomePage />
+      <AppRoutes />
     </TonConnectUIProvider>
   );
 };
