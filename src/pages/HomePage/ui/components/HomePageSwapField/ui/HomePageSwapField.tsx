@@ -55,7 +55,7 @@ export const HomePageField: React.FC<Props> = ({
 
       // Проверка на пустое значение или ноль, чтобы установить ошибку
       if (setError) {
-        setError(!value || numericValue === 0);
+        setError(parseFloat(value) === 0 || isNaN(parseFloat(value)));
       }
     }
   };
@@ -84,7 +84,7 @@ export const HomePageField: React.FC<Props> = ({
 
     // Проверяем значение для setError
     if (setError) {
-      setError(!newValue || parseFloat(newValue) === 0);
+      setError(parseFloat(newValue) === 0 || isNaN(parseFloat(newValue)));
     }
   };
 
