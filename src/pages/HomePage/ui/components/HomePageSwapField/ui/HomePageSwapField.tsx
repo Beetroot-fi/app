@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import s from "./HomePageSwapField.module.scss";
-import { useState } from "react";
 
 interface Props {
   item: {
@@ -13,6 +12,8 @@ interface Props {
     course?: number;
     calculatedValue?: string;
     setCalculatedValue?: React.Dispatch<React.SetStateAction<string>>;
+    currentTabNum?: number | null;
+    setCurrentTabNum?: React.Dispatch<React.SetStateAction<number | null>>;
   };
   setError?: React.Dispatch<React.SetStateAction<boolean>>;
   inputValue: string;
@@ -25,9 +26,6 @@ export const HomePageField: React.FC<Props> = ({
   inputValue,
   setInputValue,
 }) => {
-  const [currentTabNum, setCurrentTabNum] = useState<number | null>(null);
-  // const [inputValue, setInputValue] = useState<string>("");
-
   const bottomTabs = ["25%", "50%", "max"];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +41,7 @@ export const HomePageField: React.FC<Props> = ({
       }
 
       setInputValue(value);
-      setCurrentTabNum(null);
+      item.setCurrentTabNum(null);
 
       // Устанавливаем setCalculatedValue с учетом курса
       if (item.course && item.setCalculatedValue) {
@@ -61,7 +59,8 @@ export const HomePageField: React.FC<Props> = ({
   };
 
   const handleTabClick = (index: number) => {
-    setCurrentTabNum(index);
+    console.log(index);
+    item.setCurrentTabNum(index);
     let newValue = "";
 
     if (bottomTabs[index] === "25%") {
@@ -121,7 +120,10 @@ export const HomePageField: React.FC<Props> = ({
             {bottomTabs.map((tab, i) => (
               <div
                 key={i}
-                className={clsx(s.bottom_tab, currentTabNum === i && s.active)}
+                className={clsx(
+                  s.bottom_tab,
+                  item.currentTabNum === i && s.active
+                )}
                 onClick={() => handleTabClick(i)}
               >
                 {tab}
