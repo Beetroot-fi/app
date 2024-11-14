@@ -10,7 +10,7 @@ interface Props {
   className?: string;
   href?: string;
   blank?: boolean;
-  type?: "pink" | "clear" | "default";
+  type?: "pink" | "clear" | "default" | "transparent";
   onClick?: () => void;
   height?: ButtonHeight;
   width?: ButtonWidth;
@@ -59,6 +59,7 @@ const Btn: React.FC<Props> = ({
     {
       [s.default]: type !== "clear" && type,
       [s.pink]: type == "pink" || disabled,
+      [s.transparent]: type == "transparent" || disabled,
     },
     className
   );

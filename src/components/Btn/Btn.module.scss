@@ -18,6 +18,7 @@ a {
     font-weight: 400;
     font-size: 36px;
     line-height: 0.84;
+    padding: 0;
 
 
     svg {
@@ -48,9 +49,23 @@ a {
         }
     }
 
+    &.transapent {
+        background: #8E0726;
+    }
+
     &.pink {
         background: #F5B3BF;
         box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
         color: #fff;
+
+        @media (hover) {
+            &:hover {
+                background: #fb8fa3;
+            }
+        }
+
+        &:active {
+            background: #fdbdc9;
+        }
     }
 }

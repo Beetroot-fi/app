@@ -28,14 +28,26 @@
         }
     }
 
-    span {
-        font-weight: 400;
-        font-size: 24px;
-        line-height: 1.2;
-        color: #66091A;
+    p {
+        span {
+            display: block;
 
-        @media (max-width: 340px) {
-            font-size: 18px;
+            &:first-child {
+                font-weight: 400;
+                font-size: 24px;
+                line-height: 1.2;
+                color: #66091A;
+
+                @media (max-width: 340px) {
+                    font-size: 18px;
+                }
+            }
+
+            &:last-child {
+                font-size: 16px;
+                color: #fff;
+                line-height: calc(19 / 16);
+            }
         }
     }
 }

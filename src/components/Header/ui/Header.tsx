@@ -11,7 +11,10 @@ export const Header = () => {
       <div className={s.wrapper}>
         <div className={s.logo}>
           <img src="/logo.png" alt="" />
-          <span>BEETROOT</span>
+          <p>
+            <span>BEETROOT</span>
+            <span>finance</span>
+          </p>
         </div>
         <HeaderConnectButton store={headerStore} />
         <HeaderDisconnect store={headerStore} />

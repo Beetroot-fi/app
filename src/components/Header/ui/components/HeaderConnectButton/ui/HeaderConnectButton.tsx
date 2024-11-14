@@ -47,7 +47,7 @@ export const HeaderConnectButton: React.FC<Props> = observer(({ store }) => {
     <div className={s.connect}>
       <Btn
         height="auto"
-        type={!wallet ? "pink" : "default"}
+        type={!wallet ? "default" : "transparent"}
         onClick={disconnectClick}
         width="full"
         fontSize="16"

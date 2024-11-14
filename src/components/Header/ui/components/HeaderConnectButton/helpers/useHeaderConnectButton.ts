@@ -18,7 +18,7 @@ export const useHeaderConnectButton = ({ store, wallet }: Props) => {
     }
   };
   const connectButtonText = useMemo(
-    () => (truncatedAddress ? truncatedAddress : "Connect"),
+    () => (truncatedAddress ? truncatedAddress : "Connect wallet"),
     [truncatedAddress]
   );
   return { disconnectClick, connectButtonText };

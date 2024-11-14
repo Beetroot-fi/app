@@ -1,14 +1,24 @@
 import { Layout } from "./components/Layout";
+import { HomePage } from "./pages/HomePage";
 import { Invite } from "./pages/Invite";
 import { MainPage } from "./pages/MainPage";
 import { Tasks } from "./pages/Tasks";
 
 const routesConfig = [
+  // {
+  //   path: "/",
+  //   element: (
+  //     <Layout>
+  //       <MainPage />
+  //     </Layout>
+  //   ),
+  //   exact: true,
+  // },
   {
     path: "/",
     element: (
       <Layout>
-        <MainPage />
+        <HomePage />
       </Layout>
     ),
     exact: true,

@@ -1,0 +1,39 @@
+.wrapper {
+    padding: 16px 0;
+    border-bottom: 1px solid #fff;
+
+    &:last-child {
+        padding-bottom: 16px;
+        border-bottom: none;
+    }
+}
+
+.top {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+
+    svg {
+        width: 24px;
+        height: 10px;
+        margin-right: 16px;
+    }
+
+    p {
+        max-width: calc(100% - 40px);
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 22px;
+        color: #F5B3BF;
+    }
+}
+
+.bottom {
+    margin-top: 12px;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    text-align: justify;
+    color: #FFFFFF;
+}

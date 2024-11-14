@@ -21,7 +21,13 @@ export const HeaderDisconnect: React.FC<Props> = observer(({ store }) => {
         </div>
         <div className={s.btns}>
           <div className={s.btn}>
-            <Btn height="38" onClick={yesClick} padding="0" fontSize="20">
+            <Btn
+              height="38"
+              type="pink"
+              onClick={yesClick}
+              padding="0"
+              fontSize="20"
+            >
               YES
             </Btn>
           </div>
