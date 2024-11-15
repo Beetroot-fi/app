@@ -16,7 +16,7 @@ export default function useJettonWallet({
     jettonMasterAddress,
 }: JettonWalletParams) {
     const client = useTonClient();
-    const { sender } = useTonConnect();
+    const { sender, connected } = useTonConnect();
     const [balance, setBalance] = useState(0);
 
     const jettonWallet = useAsyncInitialize(async () => {
@@ -41,7 +41,7 @@ export default function useJettonWallet({
         if (jettonWallet) {
             getJettonBalance();
         }
-    }, [jettonWallet, client]);
+    }, [jettonWallet, client, connected]);
 
     return {
         balance: balance,
