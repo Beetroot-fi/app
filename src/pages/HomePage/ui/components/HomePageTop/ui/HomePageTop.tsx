@@ -24,6 +24,7 @@ export const HomePageTop = () => {
   const [currentTabNum, setCurrentTabNum] = useState<number | null>(null);
   const client = useTonClient();
   const [userScAddress, setUserScAddress] = useState("");
+  const [tvl, setTvl] = useState(0);
 
   const ownerAddress = useMemo(() => {
     return wallet?.account.address
@@ -49,6 +50,13 @@ export const HomePageTop = () => {
         Address.parseRaw(wallet?.account.address)
       );
       setUserScAddress(userScAddress.toString());
+
+      const mainScJettonWallet = useJettonWallet({
+        ownerAddress: Address.parse(MAIN_SC_ADDRESS),
+        jettonMasterAddress: Address.parse(USDT_JETTON_MASTER_ADDRESS),
+      });
+      const tvl = mainScJettonWallet.balance;
+      setTvl(tvl / 1e6);
     };
     getData();
   }, [client, wallet]);
@@ -149,7 +157,7 @@ export const HomePageTop = () => {
       </div>
       <div className={s.rtva}>
         <p>real time vault APY</p>
-        <p>9.57 %</p>
+        <p>15 %</p>
       </div>
       <div className={s.roots}>
         <div className={s.root}>
@@ -158,7 +166,7 @@ export const HomePageTop = () => {
         </div>
         <div className={s.root}>
           <p>ROOT TVL</p>
-          <p>$250M</p>
+          <p>${tvl}</p>
         </div>
       </div>
     </div>
