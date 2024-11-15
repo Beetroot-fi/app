@@ -7,11 +7,11 @@ import s from "./Footer.module.scss";
 
 const socLinks = [
   {
-    link: "https://x.com/",
+    link: "https://x.com/beetroot_fi",
     icon: <XIcon />,
   },
   {
-    link: "https://github.com/",
+    link: "https://github.com/Beetroot-fi",
     icon: <GithubIcon />,
   },
   {
@@ -19,7 +19,7 @@ const socLinks = [
     icon: <DiscordIcon />,
   },
   {
-    link: "https://t.me/",
+    link: "https://t.me/BeetrootFinance",
     icon: <TelegramIcon />,
   },
 ];
