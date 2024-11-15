@@ -41,7 +41,7 @@ export default function useJettonWallet({
         if (jettonWallet) {
             getJettonBalance();
         }
-    }, [jettonWallet]);
+    }, [jettonWallet, client]);
 
     return {
         balance: balance,
