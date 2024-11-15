@@ -31,7 +31,7 @@ export const HomePageField: React.FC<Props> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let { value } = e.target;
 
-    // Регулярное выражение для проверки: положительные числа, допускаются числа с точкой и не более 2 цифр после точки
+    // Разрешаем ввод только положительных чисел, включая дробные, с не более чем 2 знаками после точки
     if (/^\d*\.?\d{0,2}$/.test(value)) {
       const numericValue = parseFloat(value);
 
@@ -53,9 +53,9 @@ export const HomePageField: React.FC<Props> = ({
         item.setCalculatedValue(calculatedValue);
       }
 
-      // Проверка на пустое значение или ноль, чтобы установить ошибку
+      // Проверяем корректность ввода для setError
       if (setError) {
-        setError(parseFloat(value) === 0 || isNaN(parseFloat(value)));
+        setError(!value || numericValue <= 0 || isNaN(numericValue));
       }
     }
   };

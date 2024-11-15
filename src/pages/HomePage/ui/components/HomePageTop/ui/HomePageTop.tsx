@@ -62,28 +62,33 @@ export const HomePageTop = () => {
   }, [swapType]);
 
   const onSwapClick = useCallback(() => {
-    if (!(error || !usdtJettonWallet)) return;
+    if (error || !usdtJettonWallet || (!usdtSwapValue && !rootSwapValue))
+      return;
 
-    if (swapType === "usdt") {
-      usdtJettonWallet?.transfer(
-        toNano("0.4"),
-        0,
-        Address.parse(MAIN_SC_ADDRESS),
-        BigInt(usdtSwapValue) * BigInt(1e6),
-        toNano("0.3"),
-        beginCell().endCell()
-      );
-    } else {
-      beetrootJettonWallet.transfer(
-        toNano("0.4"),
-        0,
-        Address.parse(userScAddress),
-        BigInt(rootSwapValue) * BigInt(1e6),
-        toNano("0.3"),
-        beginCell().endCell()
-      );
+    try {
+      if (swapType === "usdt") {
+        usdtJettonWallet?.transfer(
+          toNano("0.4"),
+          0,
+          Address.parse(MAIN_SC_ADDRESS),
+          BigInt(Math.floor(parseFloat(usdtSwapValue) * 1e6)),
+          toNano("0.3"),
+          beginCell().endCell()
+        );
+      } else {
+        beetrootJettonWallet.transfer(
+          toNano("0.5"),
+          0,
+          Address.parse(userScAddress),
+          BigInt(Math.floor(parseFloat(rootSwapValue) * 1e9)),
+          toNano("0.5"),
+          beginCell().endCell()
+        );
+      }
+    } catch (err) {
+      console.error("Ошибка при обработке Swap:", err);
     }
-  }, [usdtSwapValue, error, swapType, usdtJettonWallet]);
+  }, [usdtSwapValue, rootSwapValue, error, swapType, usdtJettonWallet]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const usdtFieldItem = useMemo(() => {
@@ -141,7 +146,9 @@ export const HomePageTop = () => {
       <div className={s.btn}>
         <Btn
           className={s.btn}
-          disabled={error || !usdtJettonWallet}
+          disabled={
+            error || !usdtJettonWallet || !rootSwapValue || !usdtSwapValue
+          }
           onClick={onSwapClick}
         >
           Swap
