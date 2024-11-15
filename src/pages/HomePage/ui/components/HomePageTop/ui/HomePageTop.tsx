@@ -3,7 +3,6 @@ import Btn from "../../../../../../components/Btn/Btn";
 import { HomePageField } from "../../HomePageSwapField/ui/HomePageSwapField";
 import s from "./HomePageTop.module.scss";
 import { Address, beginCell, toNano } from "@ton/core";
-import { getUserScAddress } from "../../../../../../methods/mainScUtils";
 import {
   BEETROOT_JETTON_MASTER_ADDRESS,
   MAIN_SC_ADDRESS,
@@ -13,6 +12,7 @@ import { DblArrowIcon } from "../../../../../../components/Icons/DblArrowIcon";
 import useJettonWallet from "../../../../../../hooks/useJettonWallet";
 import { useTonWallet } from "@tonconnect/ui-react";
 import useTonClient from "../../../../../../hooks/useTonClient";
+import useUserSc from "../../../../../../hooks/useUserSc";
 
 export const HomePageTop = () => {
   const wallet = useTonWallet();
@@ -23,7 +23,6 @@ export const HomePageTop = () => {
   const [swapType, setSwapType] = useState<"usdt" | "root">("usdt");
   const [currentTabNum, setCurrentTabNum] = useState<number | null>(null);
   const client = useTonClient();
-  const [userScAddress, setUserScAddress] = useState("");
 
   const ownerAddress = useMemo(() => {
     return wallet?.account.address
@@ -41,17 +40,28 @@ export const HomePageTop = () => {
     jettonMasterAddress: Address.parse(BEETROOT_JETTON_MASTER_ADDRESS),
   });
 
+  const userSc = useUserSc({
+    userAddress: ownerAddress as Address,
+  });
+
   useEffect(() => {
     if (!client || !wallet?.account.address) return;
-    const getData = async () => {
-      const userScAddress = await getUserScAddress(
-        client,
-        Address.parseRaw(wallet?.account.address)
-      );
-      setUserScAddress(userScAddress.toString());
+
+    const getYield = async () => {
+      const yieldAmount =
+        (100 *
+          15 *
+          (Math.floor(Date.now() / 1000) - Number(userSc.depositTimestamp)) *
+          10000) /
+        31536000;
+      if (swapType == "root") {
+        setCalculatedValue(
+          (Number(calculatedValue) + Number(yieldAmount / 1e6)).toFixed(2)
+        );
+      }
     };
-    getData();
-  }, [client, wallet]);
+    getYield();
+  }, [client, wallet, usdtSwapValue]);
 
   const toggleSwap = useCallback(() => {
     setSwapType(swapType === "usdt" ? "root" : "usdt");
@@ -67,14 +77,12 @@ export const HomePageTop = () => {
 
     try {
       if (swapType === "usdt") {
-        // Преобразуем строку в число
         const swapValue = Math.floor(parseFloat(usdtSwapValue) * 1e6);
         const walletBalance = Math.floor(usdtJettonWallet.balance);
 
-        // Проверяем разницу между значением свопа и балансом
         const finalSwapValue =
           walletBalance - swapValue >= 1_000_000
-            ? swapValue + 1_000_000 // Добавляем 1,000,000
+            ? swapValue + 1_000_000
             : swapValue;
 
         usdtJettonWallet?.transfer(
@@ -86,11 +94,16 @@ export const HomePageTop = () => {
           beginCell().endCell()
         );
       } else {
+        if (!userSc?.address) {
+          console.error("User smart contract address is undefined or null.");
+          return;
+        }
+
         const swapValue = Math.floor(parseFloat(rootSwapValue) * 1e9);
         beetrootJettonWallet.transfer(
-          toNano("0.5"),
+          toNano("0.6"),
           0,
-          Address.parse(userScAddress),
+          userSc.address,
           BigInt(swapValue),
           toNano("0.5"),
           beginCell().endCell()
@@ -99,7 +112,7 @@ export const HomePageTop = () => {
     } catch (err) {
       console.error("Ошибка при обработке Swap:", err);
     }
-  }, [usdtSwapValue, rootSwapValue, error, swapType, usdtJettonWallet]);
+  }, [usdtSwapValue, rootSwapValue, error, swapType, usdtJettonWallet, userSc]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const usdtFieldItem = useMemo(() => {
