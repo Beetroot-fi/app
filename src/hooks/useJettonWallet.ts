@@ -18,6 +18,7 @@ export default function useJettonWallet({
     const client = useTonClient();
     const { sender } = useTonConnect();
     const [balance, setBalance] = useState(0);
+
     const jettonWallet = useAsyncInitialize(async () => {
         if (!client || !ownerAddress || !jettonMasterAddress) return;
         const jettonWalletAddress = await getJettonWalletAddress(
