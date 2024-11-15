@@ -41,7 +41,9 @@ export const HomePageField: React.FC<Props> = ({
       }
 
       setInputValue(value);
-      item.setCurrentTabNum(null);
+      if (item.setCurrentTabNum) {
+        item.setCurrentTabNum(null);
+      }
 
       // Устанавливаем setCalculatedValue с учетом курса
       if (item.course && item.setCalculatedValue) {
@@ -60,7 +62,9 @@ export const HomePageField: React.FC<Props> = ({
 
   const handleTabClick = (index: number) => {
     console.log(index);
-    item.setCurrentTabNum(index);
+    if (item.setCurrentTabNum) {
+      item.setCurrentTabNum(index);
+    }
     let newValue = "";
 
     if (bottomTabs[index] === "25%") {
