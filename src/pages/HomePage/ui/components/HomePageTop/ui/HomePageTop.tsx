@@ -3,6 +3,7 @@ import Btn from "../../../../../../components/Btn/Btn";
 import { HomePageField } from "../../HomePageSwapField/ui/HomePageSwapField";
 import s from "./HomePageTop.module.scss";
 import { Address, beginCell, toNano } from "@ton/core";
+import { getUserScAddress } from "../../../../../../methods/mainScUtils";
 import {
   BEETROOT_JETTON_MASTER_ADDRESS,
   MAIN_SC_ADDRESS,
@@ -11,6 +12,7 @@ import {
 import { DblArrowIcon } from "../../../../../../components/Icons/DblArrowIcon";
 import useJettonWallet from "../../../../../../hooks/useJettonWallet";
 import { useTonWallet } from "@tonconnect/ui-react";
+import useTonClient from "../../../../../../hooks/useTonClient";
 
 export const HomePageTop = () => {
   const wallet = useTonWallet();
@@ -20,6 +22,8 @@ export const HomePageTop = () => {
   const [rootSwapValue, setRootSwapValue] = useState("");
   const [swapType, setSwapType] = useState<"usdt" | "root">("usdt");
   const [currentTabNum, setCurrentTabNum] = useState<number | null>(null);
+  const client = useTonClient();
+  const [userScAddress, setUserScAddress] = useState("");
 
   const ownerAddress = useMemo(() => {
     return wallet?.account.address
@@ -36,6 +40,18 @@ export const HomePageTop = () => {
     ownerAddress: ownerAddress as Address,
     jettonMasterAddress: Address.parse(BEETROOT_JETTON_MASTER_ADDRESS),
   });
+
+  useEffect(() => {
+    if (!client || !wallet?.account.address) return;
+    const getData = async () => {
+      const userScAddress = await getUserScAddress(
+        client,
+        Address.parseRaw(wallet?.account.address)
+      );
+      setUserScAddress(userScAddress.toString());
+    };
+    getData();
+  }, [client, wallet]);
 
   const toggleSwap = useCallback(() => {
     setSwapType(swapType === "usdt" ? "root" : "usdt");
@@ -58,7 +74,14 @@ export const HomePageTop = () => {
         beginCell().endCell()
       );
     } else {
-      // Здесь функция для root
+      beetrootJettonWallet.transfer(
+        toNano("0.4"),
+        0,
+        Address.parse(userScAddress),
+        BigInt(rootSwapValue) * BigInt(1e6),
+        toNano("0.3"),
+        beginCell().endCell()
+      );
     }
   }, [usdtSwapValue, error, swapType, usdtJettonWallet]);
 
