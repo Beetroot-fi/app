@@ -7,72 +7,72 @@ import { getJettonWalletAddress } from "../methods/jettonUtils";
 import { useEffect, useState } from "react";
 
 type JettonWalletParams = {
-  ownerAddress: Address;
-  jettonMasterAddress: Address;
+    ownerAddress: Address;
+    jettonMasterAddress: Address;
 };
 
 export default function useJettonWallet({
-  ownerAddress,
-  jettonMasterAddress,
+    ownerAddress,
+    jettonMasterAddress,
 }: JettonWalletParams) {
-  const client = useTonClient();
-  const { sender } = useTonConnect();
-  const [balance, setBalance] = useState(0);
+    const client = useTonClient();
+    const { sender } = useTonConnect();
+    const [balance, setBalance] = useState(0);
 
-  // Изменяем зависимости на [ownerAddress]
-  const jettonWallet = useAsyncInitialize(async () => {
-    if (!client || !ownerAddress || !jettonMasterAddress) return;
+    const jettonWallet = useAsyncInitialize(async () => {
+        if (!client || !ownerAddress || !jettonMasterAddress) return;
 
-    const jettonWalletAddress = await getJettonWalletAddress(
-      client,
-      ownerAddress,
-      jettonMasterAddress
-    );
-    const contract = new JettonWallet(jettonWalletAddress);
-    return client.open(contract) as OpenedContract<JettonWallet>;
-  }, [ownerAddress]);
+        const jettonWalletAddress = await getJettonWalletAddress(
+            client,
+            ownerAddress,
+            jettonMasterAddress
+        );
+        const contract = new JettonWallet(jettonWalletAddress);
+        return client.open(contract) as OpenedContract<JettonWallet>;
+    }, [ownerAddress]);
 
-  // Изменяем зависимости на [jettonWallet]
-  useEffect(() => {
-    async function getJettonBalance() {
-      if (!jettonWallet) return;
+    useEffect(() => {
+        async function getJettonBalance() {
+            if (!jettonWallet) return;
 
-      const { balance } = await jettonWallet.getWalletData();
-      setBalance(Number(balance));
-    }
-    getJettonBalance();
-  }, [jettonWallet]);
+            const { balance } = await jettonWallet.getWalletData();
+            setBalance(Number(balance));
+        }
+        if (jettonWallet) {
+            getJettonBalance();
+        }
+    }, [jettonWallet]);
 
-  return {
-    balance: balance,
-    transfer: async (
-      value: bigint,
-      queryId: number,
-      toAddress: Address,
-      jettonAmount: bigint,
-      fwdAmount: bigint,
-      forwardPayload: Cell | null
-    ) => {
-      return jettonWallet?.sendTransfer(sender, {
-        value: value,
-        queryId: queryId,
-        toAddress: toAddress,
-        jettonAmount: jettonAmount,
-        fwdAmount: fwdAmount,
-        forwardPayload: forwardPayload,
-      });
-    },
-    burn: async (
-      value: bigint,
-      queryId: bigint,
-      jettonAmount: bigint,
-      responseAddress: Address
-    ) => {
-      return jettonWallet?.sendBurn(sender, value, {
-        queryId: queryId,
-        jettonAmount: jettonAmount,
-        responseAddress: responseAddress,
-      });
-    },
-  };
+    return {
+        balance: balance,
+        transfer: async (
+            value: bigint,
+            queryId: number,
+            toAddress: Address,
+            jettonAmount: bigint,
+            fwdAmount: bigint,
+            forwardPayload: Cell | null
+        ) => {
+            return jettonWallet?.sendTransfer(sender, {
+                value: value,
+                queryId: queryId,
+                toAddress: toAddress,
+                jettonAmount: jettonAmount,
+                fwdAmount: fwdAmount,
+                forwardPayload: forwardPayload,
+            });
+        },
+        burn: async (
+            value: bigint,
+            queryId: bigint,
+            jettonAmount: bigint,
+            responseAddress: Address
+        ) => {
+            return jettonWallet?.sendBurn(sender, value, {
+                queryId: queryId,
+                jettonAmount: jettonAmount,
+                responseAddress: responseAddress,
+            });
+        },
+    };
 }
