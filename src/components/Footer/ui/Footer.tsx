@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { DiscordIcon } from "../../Icons/DiscordIcon";
 import { GithubIcon } from "../../Icons/GithubIcon";
 import { TelegramIcon } from "../../Icons/TelegramIcon";
 import { XIcon } from "../../Icons/XIcon";
@@ -13,10 +12,6 @@ const socLinks = [
   {
     link: "https://github.com/Beetroot-fi",
     icon: <GithubIcon />,
-  },
-  {
-    link: "https://discord.com/",
-    icon: <DiscordIcon />,
   },
   {
     link: "https://t.me/BeetrootFinance",
