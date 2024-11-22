@@ -7,7 +7,7 @@ export default function useTonClient() {
     return useAsyncInitialize(
         async () =>
             new TonClient({
-                endpoint: await getHttpEndpoint({ network: 'testnet' }),
+                endpoint: await getHttpEndpoint({ network: 'mainnet' }),
                 apiKey: import.meta.env.VITE_TONCENTER_API_KEY,
             }),
     )
