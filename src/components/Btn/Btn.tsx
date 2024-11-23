@@ -58,8 +58,9 @@ const Btn: React.FC<Props> = ({
     s.btn,
     {
       [s.default]: type !== "clear" && type,
-      [s.pink]: type == "pink" || disabled,
-      [s.transparent]: type == "transparent" || disabled,
+      [s.pink]: type == "pink",
+      [s.transparent]: type == "transparent",
+      [s.disabled]: disabled,
     },
     className
   );

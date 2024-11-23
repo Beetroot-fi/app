@@ -61,7 +61,6 @@ export const HomePageField: React.FC<Props> = ({
   };
 
   const handleTabClick = (index: number) => {
-    console.log(index);
     if (item.setCurrentTabNum) {
       item.setCurrentTabNum(index);
     }

@@ -55,9 +55,13 @@
         font-size: 32px;
         line-height: 48px;
         text-align: right;
-        color: rgba(176, 74, 92, 1);
+        color: #66091A;
         width: 100%;
         height: 100%;
+
+        &.disable {
+            color: rgba(176, 74, 92, 1);
+        }
     }
 
     input {
@@ -71,6 +75,10 @@
         color: #66091A;
         width: 100%;
         height: 100%;
+
+        &.disable {
+            color: rgba(176, 74, 92, 1);
+        }
 
         &::placeholder {
             color: rgba(176, 74, 92, 1);

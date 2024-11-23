@@ -116,7 +116,7 @@ export const HomePageTop = () => {
       img: "usdt-icon.png",
       name: "usdt",
       giveItAway: swapType === "usdt",
-      balance: Number(usdtJettonWallet?.balance / 1e6),
+      balance: wallet ? Number(usdtJettonWallet?.balance / 1e6) : 0,
       course: swapType === "usdt" ? 0.01 : 0,
       disabled: swapType !== "usdt",
       setCalculatedValue: swapType === "usdt" ? setCalculatedValue : () => {},
@@ -124,14 +124,14 @@ export const HomePageTop = () => {
       currentTabNum: swapType === "usdt" ? currentTabNum : undefined,
       setCurrentTabNum: swapType === "usdt" ? setCurrentTabNum : () => {},
     };
-  }, [usdtJettonWallet, swapType, calculatedValue, currentTabNum]);
+  }, [usdtJettonWallet, swapType, calculatedValue, currentTabNum, wallet]);
 
   const rootFieldItem = useMemo(() => {
     return {
       img: "root-icon.png",
       name: "root",
       giveItAway: swapType === "root",
-      balance: Number(beetrootJettonWallet?.balance / 1e9),
+      balance: wallet ? Number(beetrootJettonWallet?.balance / 1e9) : 0,
       course: swapType === "root" ? 100 : 0,
       disabled: swapType !== "root",
       calculatedValue: swapType !== "root" ? calculatedValue : undefined,
@@ -139,7 +139,7 @@ export const HomePageTop = () => {
       currentTabNum: swapType === "root" ? currentTabNum : undefined,
       setCurrentTabNum: swapType === "root" ? setCurrentTabNum : () => {},
     };
-  }, [beetrootJettonWallet, calculatedValue, swapType, currentTabNum]);
+  }, [beetrootJettonWallet, calculatedValue, swapType, currentTabNum, wallet]);
 
   return (
     <div className={s.wrapper}>
@@ -165,10 +165,9 @@ export const HomePageTop = () => {
       </div>
       <div className={s.btn}>
         <Btn
+          type="pink"
           className={s.btn}
-          disabled={
-            error || !usdtJettonWallet || !rootSwapValue || !usdtSwapValue
-          }
+          disabled={error}
           onClick={onSwapClick}
         >
           Swap
