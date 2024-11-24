@@ -1,15 +1,22 @@
-import { beginCell, Address, TonClient } from "@ton/ton";
+import { beginCell, Address, Cell } from "@ton/ton";
+import { jettonOpCodes } from "../op";
 
-export async function getJettonWalletAddress(
-    client: TonClient,
-    userAddress: Address,
-    jettonMasterAddress: Address
-): Promise<Address> {
-    const result = await client.runMethod(
-        jettonMasterAddress,
-        'get_wallet_address',
-        [{ type: 'slice', cell: beginCell().storeAddress(userAddress).endCell() }],
-    );
-
-    return result.stack.readAddress();
+export function getJettonTransferBody(
+    queryId: bigint,
+    jettonAmount: bigint,
+    destination: Address,
+    responseDestination: Address,
+    fwdTonAmount: bigint,
+    fwdPayload: Cell | null,
+) {
+    return beginCell()
+        .storeUint(jettonOpCodes.transfer, 32)
+        .storeUint(queryId, 64)
+        .storeCoins(jettonAmount)
+        .storeAddress(destination)
+        .storeAddress(responseDestination)
+        .storeBit(0)
+        .storeCoins(fwdTonAmount)
+        .storeMaybeRef(fwdPayload)
+        .endCell();
 }
