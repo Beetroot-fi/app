@@ -1,69 +1,63 @@
+import { DblArrowIcon } from "../../../../../../components/Icons/DblArrowIcon";
+import { getJettonTransferBody } from "../../../../../../methods/jettonUtils";
+import { HomePageField } from "../../HomePageSwapField/ui/HomePageSwapField";
+import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Btn from "../../../../../../components/Btn/Btn";
-import { HomePageField } from "../../HomePageSwapField/ui/HomePageSwapField";
+import { JettonBalance } from "@ton-api/client";
+import { Address, toNano } from "@ton/core";
+import { getJettonBalance } from "../../../../../../methods/tonapi";
 import s from "./HomePageTop.module.scss";
-import { Address, beginCell, toNano, Cell } from "@ton/core";
 import {
   BEETROOT_JETTON_MASTER_ADDRESS,
   MAIN_SC_ADDRESS,
   USDT_JETTON_MASTER_ADDRESS,
 } from "../../../../../../consts";
-import { getMainData } from "../../../../../../methods/mainScUtils";
-import { DblArrowIcon } from "../../../../../../components/Icons/DblArrowIcon";
-import useJettonWallet from "../../../../../../hooks/useJettonWallet";
-import { useTonWallet } from "@tonconnect/ui-react";
-import useTonClient from "../../../../../../hooks/useTonClient";
-
-type MainDataType = {
-  usdtJettonMasterAddress: Address;
-  rootMasterAddress: Address;
-  userScCode: Cell;
-  adminAddress: Address;
-  usdtJettonWalletCode: Cell;
-  jettonWalletCode: Cell;
-  rootPrice: bigint;
-  tradoorMasterAddress: Address;
-  stormVaultAddress: Address;
-  usdtSlpJettonWallet: Address;
-  usdtTlpJettonWallet: Address;
-};
 
 export const HomePageTop = () => {
   const wallet = useTonWallet();
   const [calculatedValue, setCalculatedValue] = useState("");
   const [error, setError] = useState(true);
   const [usdtSwapValue, setUsdtSwapValue] = useState("");
+  const [usdtJettonWallet, setUsdtJettonWallet] = useState<
+    JettonBalance | undefined
+  >();
   const [rootSwapValue, setRootSwapValue] = useState("");
+  const [rootJettonWallet, setRootJettonWallet] = useState<
+    JettonBalance | undefined
+  >();
   const [swapType, setSwapType] = useState<"usdt" | "root">("usdt");
   const [currentTabNum, setCurrentTabNum] = useState<number | null>(null);
-  const [mainData, setMainData] = useState<MainDataType | null>(null);
-  const client = useTonClient();
-
-  const ownerAddress = useMemo(() => {
-    return wallet?.account.address
-      ? Address.parseRaw(wallet.account.address)
-      : null;
-  }, [wallet]);
-
-  const usdtJettonWallet = useJettonWallet({
-    ownerAddress: ownerAddress as Address,
-    jettonMasterAddress: Address.parse(USDT_JETTON_MASTER_ADDRESS),
-  });
-
-  const beetrootJettonWallet = useJettonWallet({
-    ownerAddress: ownerAddress as Address,
-    jettonMasterAddress: Address.parse(BEETROOT_JETTON_MASTER_ADDRESS),
-  });
+  const [tonConnectUi] = useTonConnectUI();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!client || !wallet?.account.address) return;
+    if (!wallet?.account.address) return;
 
     const gettingMainData = async () => {
-      let mainData = await getMainData(client);
-      setMainData(mainData);
+      setLoading(true);
+      try {
+        let [usdtJettonWallet, rootJettonWallet] = await Promise.all([
+          getJettonBalance(
+            Address.parseRaw(wallet.account.address),
+            Address.parse(USDT_JETTON_MASTER_ADDRESS)
+          ),
+          getJettonBalance(
+            Address.parseRaw(wallet.account.address),
+            Address.parse(BEETROOT_JETTON_MASTER_ADDRESS)
+          ),
+        ]);
+
+        setUsdtJettonWallet(usdtJettonWallet);
+        setRootJettonWallet(rootJettonWallet);
+      } catch (error) {
+        console.error("Error fetching balances:", error);
+      } finally {
+        setLoading(false);
+      }
     };
     gettingMainData();
-  }, [client, wallet]);
+  }, [wallet]);
 
   const toggleSwap = useCallback(() => {
     setSwapType(swapType === "usdt" ? "root" : "usdt");
@@ -73,42 +67,97 @@ export const HomePageTop = () => {
     setError(true);
   }, [swapType]);
 
+  const getFormattedBalance = useCallback(
+    (balance: bigint | undefined, decimals: number): number => {
+      if (loading || !wallet || balance === undefined) return 0;
+      return Number(
+        (Number(balance) / Math.pow(10, decimals)).toFixed(
+          decimals === 6 ? 2 : 4
+        )
+      );
+    },
+    [loading, wallet]
+  );
+
   const onSwapClick = useCallback(async () => {
-    if (error || !usdtJettonWallet || (!usdtSwapValue && !rootSwapValue))
+    if (error || (!usdtSwapValue && !rootSwapValue) || !wallet?.account.address)
       return;
 
     try {
       if (swapType === "usdt") {
         const swapValue = Math.floor(parseFloat(usdtSwapValue) * 1e6);
-        const walletBalance = Math.floor(usdtJettonWallet.balance);
+
+        const usdtWalletAddress =
+          usdtJettonWallet?.walletAddress.address.toRawString();
+        if (!usdtWalletAddress) {
+          console.error("USDT wallet address not found");
+          return;
+        }
 
         const finalSwapValue =
-          walletBalance - swapValue >= 1_000_000
+          Number(usdtJettonWallet?.balance) - swapValue >= 1_000_000
             ? swapValue + 1_000_000
             : swapValue;
 
-        await usdtJettonWallet?.transfer(
-          toNano("0.92"),
-          0,
-          Address.parse(MAIN_SC_ADDRESS),
+        let body = getJettonTransferBody(
+          0n,
           BigInt(finalSwapValue),
-          toNano("0.9"),
-          beginCell().endCell()
-        );
-      } else {
-        await beetrootJettonWallet.transfer(
-          toNano("0.9"),
-          0,
           Address.parse(MAIN_SC_ADDRESS),
-          BigInt(Math.floor(parseFloat(rootSwapValue) * 1e9)),
-          toNano("0.92"),
-          beginCell().endCell()
+          Address.parseRaw(wallet.account.address),
+          toNano("0.9"),
+          null
         );
+
+        tonConnectUi.sendTransaction({
+          messages: [
+            {
+              address: usdtWalletAddress,
+              amount: toNano("0.92").toString(),
+              payload: body.toBoc().toString("base64"),
+            },
+          ],
+          validUntil: Date.now() + 5 * 60 * 1000,
+        });
+      } else {
+        const rootWalletAddress =
+          rootJettonWallet?.walletAddress.address.toRawString();
+        if (!rootWalletAddress) {
+          console.error("ROOT wallet address not found");
+          return;
+        }
+
+        let body = getJettonTransferBody(
+          0n,
+          BigInt(Math.floor(parseFloat(rootSwapValue) * 1e9)),
+          Address.parse(MAIN_SC_ADDRESS),
+          Address.parseRaw(wallet.account.address),
+          toNano("0.9"),
+          null
+        );
+
+        tonConnectUi.sendTransaction({
+          messages: [
+            {
+              address: rootWalletAddress,
+              amount: toNano("0.92").toString(),
+              payload: body.toBoc().toString("base64"),
+            },
+          ],
+          validUntil: Date.now() + 5 * 60 * 1000,
+        });
       }
     } catch (err) {
       console.error("Ошибка при обработке Swap:", err);
     }
-  }, [usdtSwapValue, rootSwapValue, error, swapType, usdtJettonWallet, wallet]);
+  }, [
+    usdtSwapValue,
+    rootSwapValue,
+    error,
+    swapType,
+    wallet,
+    rootJettonWallet,
+    usdtJettonWallet,
+  ]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const usdtFieldItem = useMemo(() => {
@@ -116,7 +165,7 @@ export const HomePageTop = () => {
       img: "usdt-icon.png",
       name: "usdt",
       giveItAway: swapType === "usdt",
-      balance: wallet ? Number(usdtJettonWallet?.balance / 1e6) : 0,
+      balance: wallet ? getFormattedBalance(usdtJettonWallet?.balance, 6) : 0,
       course: swapType === "usdt" ? 0.01 : 0,
       disabled: swapType !== "usdt",
       setCalculatedValue: swapType === "usdt" ? setCalculatedValue : () => {},
@@ -124,14 +173,14 @@ export const HomePageTop = () => {
       currentTabNum: swapType === "usdt" ? currentTabNum : undefined,
       setCurrentTabNum: swapType === "usdt" ? setCurrentTabNum : () => {},
     };
-  }, [usdtJettonWallet, swapType, calculatedValue, currentTabNum, wallet]);
+  }, [swapType, calculatedValue, currentTabNum, wallet, usdtJettonWallet]);
 
   const rootFieldItem = useMemo(() => {
     return {
       img: "root-icon.png",
       name: "root",
       giveItAway: swapType === "root",
-      balance: wallet ? Number(beetrootJettonWallet?.balance / 1e9) : 0,
+      balance: wallet ? getFormattedBalance(rootJettonWallet?.balance, 9) : 0,
       course: swapType === "root" ? 100 : 0,
       disabled: swapType !== "root",
       calculatedValue: swapType !== "root" ? calculatedValue : undefined,
@@ -139,7 +188,7 @@ export const HomePageTop = () => {
       currentTabNum: swapType === "root" ? currentTabNum : undefined,
       setCurrentTabNum: swapType === "root" ? setCurrentTabNum : () => {},
     };
-  }, [beetrootJettonWallet, calculatedValue, swapType, currentTabNum, wallet]);
+  }, [calculatedValue, swapType, currentTabNum, wallet, rootJettonWallet]);
 
   return (
     <div className={s.wrapper}>
@@ -180,7 +229,7 @@ export const HomePageTop = () => {
       <div className={s.roots}>
         <div className={s.root}>
           <p>ROOT PRICE</p>
-          <p>${mainData?.rootPrice.toString()}</p>
+          <p>$100</p>
         </div>
         <div className={s.root}>
           <p>ROOT TVL</p>
