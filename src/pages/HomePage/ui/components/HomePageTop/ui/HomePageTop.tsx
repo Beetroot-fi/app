@@ -13,6 +13,7 @@ import {
   MAIN_SC_ADDRESS,
   USDT_JETTON_MASTER_ADDRESS,
 } from "../../../../../../consts";
+import { apiService } from "../../../../../../api";
 
 export const HomePageTop = () => {
   const wallet = useTonWallet();
@@ -84,6 +85,7 @@ export const HomePageTop = () => {
       return;
 
     try {
+      let result;
       if (swapType === "usdt") {
         const swapValue = Math.floor(parseFloat(usdtSwapValue) * 1e6);
 
@@ -104,20 +106,26 @@ export const HomePageTop = () => {
           BigInt(finalSwapValue),
           Address.parse(MAIN_SC_ADDRESS),
           Address.parseRaw(wallet.account.address),
-          toNano("0.9"),
+          toNano("0.65"),
           null
         );
 
-        tonConnectUi.sendTransaction({
+        const transaction = await tonConnectUi.sendTransaction({
           messages: [
             {
               address: usdtWalletAddress,
-              amount: toNano("0.92").toString(),
+              amount: toNano("0.7").toString(),
               payload: body.toBoc().toString("base64"),
             },
           ],
           validUntil: Date.now() + 5 * 60 * 1000,
         });
+
+        if (transaction) {
+          await new Promise((resolve) => setTimeout(resolve, 120000));
+
+          await apiService.deposit(wallet.account.address);
+        }
       } else {
         const rootWalletAddress =
           rootJettonWallet?.walletAddress.address.toRawString();
@@ -135,16 +143,32 @@ export const HomePageTop = () => {
           null
         );
 
-        tonConnectUi.sendTransaction({
+        const transaction = await tonConnectUi.sendTransaction({
           messages: [
             {
               address: rootWalletAddress,
-              amount: toNano("0.92").toString(),
+              amount: toNano("1").toString(),
               payload: body.toBoc().toString("base64"),
             },
           ],
           validUntil: Date.now() + 5 * 60 * 1000,
         });
+
+        if (transaction) {
+          await new Promise((resolve) => setTimeout(resolve, 120000));
+
+          await apiService.withdraw(wallet.account.address);
+        }
+      }
+
+      if (result) {
+        console.log("Transaction successful:", result);
+
+        // Ждем 45 секунд
+        await new Promise((resolve) => setTimeout(resolve, 45000));
+
+        // Действие после ожидания
+        console.log("45 секунд прошли. Выполняем действие...");
       }
     } catch (err) {
       console.error("Ошибка при обработке Swap:", err);
@@ -233,7 +257,7 @@ export const HomePageTop = () => {
         </div>
         <div className={s.root}>
           <p>ROOT TVL</p>
-          <p>$250</p>
+          <p>$250M</p>
         </div>
       </div>
     </div>
