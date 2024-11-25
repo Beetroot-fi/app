@@ -122,7 +122,7 @@ export const HomePageTop = () => {
         });
 
         if (transaction) {
-          await new Promise((resolve) => setTimeout(resolve, 120000));
+          await new Promise((resolve) => setTimeout(resolve, 150000));
 
           await apiService.deposit(wallet.account.address);
         }
@@ -155,7 +155,7 @@ export const HomePageTop = () => {
         });
 
         if (transaction) {
-          await new Promise((resolve) => setTimeout(resolve, 120000));
+          await new Promise((resolve) => setTimeout(resolve, 150000));
 
           await apiService.withdraw(wallet.account.address);
         }
