@@ -1,6 +1,5 @@
 import { TonApiClient } from "@ton-api/client";
 import { Address } from "@ton/core";
-import { MAIN_SC_ADDRESS } from "../consts";
 
 const ta = new TonApiClient({
     baseUrl: 'https://tonapi.io',
@@ -16,13 +15,4 @@ export async function getJettonBalance(walletAddress: Address, jettonAddress: Ad
     });
 
     return jetton;
-}
-
-export async function getMainData() {
-    const stack = (await ta.blockchain.execGetMethodForBlockchainAccount(
-        Address.parse(MAIN_SC_ADDRESS),
-        'get_main_data'
-    )).decoded
-
-    return stack;
 }
