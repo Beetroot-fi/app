@@ -37,4 +37,13 @@ export const apiService = {
             throw error;
         }
     },
+
+    metrics: async () => {
+        try {
+            const response = await api.get('/v1/metrics');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
 };
