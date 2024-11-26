@@ -33,6 +33,7 @@ export const HomePageTop = () => {
   const [tonConnectUi] = useTonConnectUI();
   const [metrics, setMetrics] = useState<MetricsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSwapDisabled, setIsSwapDisabled] = useState(false);
 
   const fetchJettonBalances = useCallback(async () => {
     if (!wallet?.account.address) return;
@@ -62,7 +63,7 @@ export const HomePageTop = () => {
     const gettingMainData = async () => {
       setLoading(true);
       try {
-        let [metricsData, usdtJettonWallet, rootJettonWallet] =
+        const [metricsData, usdtJettonWallet, rootJettonWallet] =
           await Promise.all([
             apiService.metrics(),
             getJettonBalance(
@@ -84,6 +85,7 @@ export const HomePageTop = () => {
         setLoading(false);
       }
     };
+
     gettingMainData();
 
     const balanceInterval = setInterval(fetchJettonBalances, 5000);
@@ -114,7 +116,7 @@ export const HomePageTop = () => {
   );
 
   const onSwapClick = useCallback(async () => {
-    if (error || !wallet?.account.address) return;
+    if (error || !wallet?.account.address || isSwapDisabled) return;
 
     const isUsdtSwap = swapType === "usdt";
     const swapValue = isUsdtSwap
@@ -146,6 +148,7 @@ export const HomePageTop = () => {
     );
 
     try {
+      setIsSwapDisabled(true);
       const transaction = await tonConnectUi.sendTransaction({
         messages: [
           {
@@ -158,13 +161,17 @@ export const HomePageTop = () => {
       });
 
       if (transaction) {
-        await new Promise((resolve) => setTimeout(resolve, 150000));
+        await new Promise((resolve) => setTimeout(resolve, 90000));
         await (isUsdtSwap
           ? apiService.deposit(wallet.account.address)
           : apiService.withdraw(wallet.account.address));
       }
     } catch (err) {
       console.error("Error during Swap:", err);
+    } finally {
+      setTimeout(() => {
+        setIsSwapDisabled(false);
+      }, 20000);
     }
   }, [
     usdtSwapValue,
@@ -174,6 +181,7 @@ export const HomePageTop = () => {
     wallet,
     usdtJettonWallet,
     rootJettonWallet,
+    isSwapDisabled,
   ]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -233,7 +241,7 @@ export const HomePageTop = () => {
         <Btn
           type="pink"
           className={s.btn}
-          disabled={error}
+          disabled={error || isSwapDisabled}
           onClick={onSwapClick}
         >
           Swap
