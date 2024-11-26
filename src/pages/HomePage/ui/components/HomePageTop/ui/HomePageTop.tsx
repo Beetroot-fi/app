@@ -2,18 +2,19 @@ import { DblArrowIcon } from "../../../../../../components/Icons/DblArrowIcon";
 import { getJettonTransferBody } from "../../../../../../methods/jettonUtils";
 import { HomePageField } from "../../HomePageSwapField/ui/HomePageSwapField";
 import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
+import { getJettonBalance } from "../../../../../../methods/tonapi";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { MetricsResponse } from "../../../../../../types";
 import Btn from "../../../../../../components/Btn/Btn";
+import { apiService } from "../../../../../../api";
 import { JettonBalance } from "@ton-api/client";
 import { Address, toNano } from "@ton/core";
-import { getJettonBalance } from "../../../../../../methods/tonapi";
 import s from "./HomePageTop.module.scss";
 import {
   BEETROOT_JETTON_MASTER_ADDRESS,
   MAIN_SC_ADDRESS,
   USDT_JETTON_MASTER_ADDRESS,
 } from "../../../../../../consts";
-import { apiService } from "../../../../../../api";
 
 export const HomePageTop = () => {
   const wallet = useTonWallet();
@@ -30,6 +31,7 @@ export const HomePageTop = () => {
   const [swapType, setSwapType] = useState<"usdt" | "root">("usdt");
   const [currentTabNum, setCurrentTabNum] = useState<number | null>(null);
   const [tonConnectUi] = useTonConnectUI();
+  const [metrics, setMetrics] = useState<MetricsResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,7 +40,8 @@ export const HomePageTop = () => {
     const gettingMainData = async () => {
       setLoading(true);
       try {
-        let [usdtJettonWallet, rootJettonWallet] = await Promise.all([
+        let [metrics, usdtJettonWallet, rootJettonWallet] = await Promise.all([
+          await apiService.metrics(),
           getJettonBalance(
             Address.parseRaw(wallet.account.address),
             Address.parse(USDT_JETTON_MASTER_ADDRESS)
@@ -49,6 +52,7 @@ export const HomePageTop = () => {
           ),
         ]);
 
+        setMetrics(metrics);
         setUsdtJettonWallet(usdtJettonWallet);
         setRootJettonWallet(rootJettonWallet);
       } catch (error) {
@@ -248,16 +252,16 @@ export const HomePageTop = () => {
       </div>
       <div className={s.rtva}>
         <p>real time vault APY</p>
-        <p>15 %</p>
+        <p>{metrics?.apy.toFixed(2)} %</p>
       </div>
       <div className={s.roots}>
         <div className={s.root}>
           <p>ROOT PRICE</p>
-          <p>$100</p>
+          <p>${metrics?.root_price}</p>
         </div>
         <div className={s.root}>
           <p>ROOT TVL</p>
-          <p>$250M</p>
+          <p>${metrics?.tvl.toFixed(2)}</p>
         </div>
       </div>
     </div>
