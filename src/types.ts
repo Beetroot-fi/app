@@ -13,3 +13,9 @@ export type MainDataType = {
     usdtSlpJettonWallet: Address;
     usdtTlpJettonWallet: Address;
 };
+
+export type MetricsResponse = {
+    tvl: number;
+    apy: number;
+    root_price: number;
+};
