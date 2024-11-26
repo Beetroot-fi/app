@@ -57,32 +57,48 @@ export const HomePageTop = () => {
     }
   }, [wallet]);
 
+  const fetchMetrics = useCallback(async () => {
+    try {
+      const metricsData = await apiService.metrics();
+      setMetrics(metricsData);
+    } catch (error) {
+      console.error("Error fetching metrics:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    if (!wallet?.account.address) return;
+    // Always fetch metrics
+    fetchMetrics();
+  }, [fetchMetrics]);
+
+  useEffect(() => {
+    // Fetch jetton balances only if wallet is connected
+    if (!wallet?.account.address) {
+      // Reset jetton wallets if no wallet is connected
+      setUsdtJettonWallet(undefined);
+      setRootJettonWallet(undefined);
+      return;
+    }
 
     const gettingMainData = async () => {
-      setLoading(true);
       try {
-        const [metricsData, usdtJettonWallet, rootJettonWallet] =
-          await Promise.all([
-            apiService.metrics(),
-            getJettonBalance(
-              Address.parseRaw(wallet.account.address),
-              Address.parseRaw(USDT_JETTON_MASTER_ADDRESS)
-            ),
-            getJettonBalance(
-              Address.parseRaw(wallet.account.address),
-              Address.parseRaw(BEETROOT_JETTON_MASTER_ADDRESS)
-            ),
-          ]);
+        const [usdtJettonWallet, rootJettonWallet] = await Promise.all([
+          getJettonBalance(
+            Address.parseRaw(wallet.account.address),
+            Address.parseRaw(USDT_JETTON_MASTER_ADDRESS)
+          ),
+          getJettonBalance(
+            Address.parseRaw(wallet.account.address),
+            Address.parseRaw(BEETROOT_JETTON_MASTER_ADDRESS)
+          ),
+        ]);
 
-        setMetrics(metricsData);
         setUsdtJettonWallet(usdtJettonWallet);
         setRootJettonWallet(rootJettonWallet);
       } catch (error) {
         console.error("Error fetching balances:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
