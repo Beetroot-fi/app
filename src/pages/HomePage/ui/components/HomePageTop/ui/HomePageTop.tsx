@@ -161,7 +161,7 @@ export const HomePageTop = () => {
       });
 
       if (transaction) {
-        await new Promise((resolve) => setTimeout(resolve, 120000));
+        await new Promise((resolve) => setTimeout(resolve, 150000));
         await (isUsdtSwap
           ? apiService.deposit(wallet.account.address)
           : apiService.withdraw(wallet.account.address));
