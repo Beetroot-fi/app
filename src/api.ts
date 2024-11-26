@@ -40,7 +40,7 @@ export const apiService = {
 
     metrics: async () => {
         try {
-            const response = await api.get('/v1/metrics');
+            const response = await api.get('/v1/metrics/');
             return response.data;
         } catch (error) {
             throw error;
