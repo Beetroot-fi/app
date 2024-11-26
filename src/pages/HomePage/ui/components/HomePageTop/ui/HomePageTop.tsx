@@ -44,11 +44,11 @@ export const HomePageTop = () => {
           await apiService.metrics(),
           getJettonBalance(
             Address.parseRaw(wallet.account.address),
-            Address.parse(USDT_JETTON_MASTER_ADDRESS)
+            Address.parseRaw(USDT_JETTON_MASTER_ADDRESS)
           ),
           getJettonBalance(
             Address.parseRaw(wallet.account.address),
-            Address.parse(BEETROOT_JETTON_MASTER_ADDRESS)
+            Address.parseRaw(BEETROOT_JETTON_MASTER_ADDRESS)
           ),
         ]);
 
@@ -85,97 +85,57 @@ export const HomePageTop = () => {
   );
 
   const onSwapClick = useCallback(async () => {
-    if (error || (!usdtSwapValue && !rootSwapValue) || !wallet?.account.address)
+    if (error || !wallet?.account.address) return;
+
+    const isUsdtSwap = swapType === "usdt";
+    const swapValue = isUsdtSwap
+      ? Math.floor(parseFloat(usdtSwapValue) * 1e6)
+      : Math.floor(parseFloat(rootSwapValue) * 1e9);
+
+    const jettonWallet = isUsdtSwap ? usdtJettonWallet : rootJettonWallet;
+    const walletAddress = jettonWallet?.walletAddress.address.toRawString();
+
+    if (!walletAddress) {
+      console.error(`${swapType.toUpperCase()} wallet address not found`);
       return;
+    }
+
+    const finalSwapValue =
+      isUsdtSwap && jettonWallet?.balance
+        ? Number(jettonWallet.balance) - swapValue >= 1_000_000
+          ? swapValue + 1_000_000
+          : swapValue
+        : swapValue;
+
+    const transferBody = getJettonTransferBody(
+      0n,
+      BigInt(finalSwapValue),
+      Address.parseRaw(MAIN_SC_ADDRESS),
+      Address.parseRaw(wallet.account.address),
+      toNano(isUsdtSwap ? "0.65" : "0.9"),
+      null
+    );
 
     try {
-      let result;
-      if (swapType === "usdt") {
-        const swapValue = Math.floor(parseFloat(usdtSwapValue) * 1e6);
+      const transaction = await tonConnectUi.sendTransaction({
+        messages: [
+          {
+            address: walletAddress,
+            amount: toNano(isUsdtSwap ? "0.7" : "1").toString(),
+            payload: transferBody.toBoc().toString("base64"),
+          },
+        ],
+        validUntil: Date.now() + 5 * 60 * 1000,
+      });
 
-        const usdtWalletAddress =
-          usdtJettonWallet?.walletAddress.address.toRawString();
-        if (!usdtWalletAddress) {
-          console.error("USDT wallet address not found");
-          return;
-        }
-
-        const finalSwapValue =
-          Number(usdtJettonWallet?.balance) - swapValue >= 1_000_000
-            ? swapValue + 1_000_000
-            : swapValue;
-
-        let body = getJettonTransferBody(
-          0n,
-          BigInt(finalSwapValue),
-          Address.parse(MAIN_SC_ADDRESS),
-          Address.parseRaw(wallet.account.address),
-          toNano("0.65"),
-          null
-        );
-
-        const transaction = await tonConnectUi.sendTransaction({
-          messages: [
-            {
-              address: usdtWalletAddress,
-              amount: toNano("0.7").toString(),
-              payload: body.toBoc().toString("base64"),
-            },
-          ],
-          validUntil: Date.now() + 5 * 60 * 1000,
-        });
-
-        if (transaction) {
-          await new Promise((resolve) => setTimeout(resolve, 150000));
-
-          await apiService.deposit(wallet.account.address);
-        }
-      } else {
-        const rootWalletAddress =
-          rootJettonWallet?.walletAddress.address.toRawString();
-        if (!rootWalletAddress) {
-          console.error("ROOT wallet address not found");
-          return;
-        }
-
-        let body = getJettonTransferBody(
-          0n,
-          BigInt(Math.floor(parseFloat(rootSwapValue) * 1e9)),
-          Address.parse(MAIN_SC_ADDRESS),
-          Address.parseRaw(wallet.account.address),
-          toNano("0.9"),
-          null
-        );
-
-        const transaction = await tonConnectUi.sendTransaction({
-          messages: [
-            {
-              address: rootWalletAddress,
-              amount: toNano("1").toString(),
-              payload: body.toBoc().toString("base64"),
-            },
-          ],
-          validUntil: Date.now() + 5 * 60 * 1000,
-        });
-
-        if (transaction) {
-          await new Promise((resolve) => setTimeout(resolve, 150000));
-
-          await apiService.withdraw(wallet.account.address);
-        }
-      }
-
-      if (result) {
-        console.log("Transaction successful:", result);
-
-        // Ждем 45 секунд
-        await new Promise((resolve) => setTimeout(resolve, 45000));
-
-        // Действие после ожидания
-        console.log("45 секунд прошли. Выполняем действие...");
+      if (transaction) {
+        await new Promise((resolve) => setTimeout(resolve, 150000));
+        await (isUsdtSwap
+          ? apiService.deposit(wallet.account.address)
+          : apiService.withdraw(wallet.account.address));
       }
     } catch (err) {
-      console.error("Ошибка при обработке Swap:", err);
+      console.error("Error during Swap:", err);
     }
   }, [
     usdtSwapValue,
@@ -183,8 +143,8 @@ export const HomePageTop = () => {
     error,
     swapType,
     wallet,
-    rootJettonWallet,
     usdtJettonWallet,
+    rootJettonWallet,
   ]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
