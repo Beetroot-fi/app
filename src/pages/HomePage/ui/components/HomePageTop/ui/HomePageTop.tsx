@@ -161,7 +161,7 @@ export const HomePageTop = () => {
       });
 
       if (transaction) {
-        await new Promise((resolve) => setTimeout(resolve, 90000));
+        await new Promise((resolve) => setTimeout(resolve, 120000));
         await (isUsdtSwap
           ? apiService.deposit(wallet.account.address)
           : apiService.withdraw(wallet.account.address));
@@ -171,7 +171,7 @@ export const HomePageTop = () => {
     } finally {
       setTimeout(() => {
         setIsSwapDisabled(false);
-      }, 20000);
+      }, 40000);
     }
   }, [
     usdtSwapValue,
