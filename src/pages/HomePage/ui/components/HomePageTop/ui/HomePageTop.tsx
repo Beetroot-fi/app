@@ -34,25 +34,48 @@ export const HomePageTop = () => {
   const [metrics, setMetrics] = useState<MetricsResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchJettonBalances = useCallback(async () => {
+    if (!wallet?.account.address) return;
+
+    try {
+      const [usdtJettonWallet, rootJettonWallet] = await Promise.all([
+        getJettonBalance(
+          Address.parseRaw(wallet.account.address),
+          Address.parseRaw(USDT_JETTON_MASTER_ADDRESS)
+        ),
+        getJettonBalance(
+          Address.parseRaw(wallet.account.address),
+          Address.parseRaw(BEETROOT_JETTON_MASTER_ADDRESS)
+        ),
+      ]);
+
+      setUsdtJettonWallet(usdtJettonWallet);
+      setRootJettonWallet(rootJettonWallet);
+    } catch (error) {
+      console.error("Error fetching balances:", error);
+    }
+  }, [wallet]);
+
   useEffect(() => {
     if (!wallet?.account.address) return;
 
     const gettingMainData = async () => {
       setLoading(true);
       try {
-        let [metrics, usdtJettonWallet, rootJettonWallet] = await Promise.all([
-          await apiService.metrics(),
-          getJettonBalance(
-            Address.parseRaw(wallet.account.address),
-            Address.parseRaw(USDT_JETTON_MASTER_ADDRESS)
-          ),
-          getJettonBalance(
-            Address.parseRaw(wallet.account.address),
-            Address.parseRaw(BEETROOT_JETTON_MASTER_ADDRESS)
-          ),
-        ]);
+        let [metricsData, usdtJettonWallet, rootJettonWallet] =
+          await Promise.all([
+            apiService.metrics(),
+            getJettonBalance(
+              Address.parseRaw(wallet.account.address),
+              Address.parseRaw(USDT_JETTON_MASTER_ADDRESS)
+            ),
+            getJettonBalance(
+              Address.parseRaw(wallet.account.address),
+              Address.parseRaw(BEETROOT_JETTON_MASTER_ADDRESS)
+            ),
+          ]);
 
-        setMetrics(metrics);
+        setMetrics(metricsData);
         setUsdtJettonWallet(usdtJettonWallet);
         setRootJettonWallet(rootJettonWallet);
       } catch (error) {
@@ -62,7 +85,13 @@ export const HomePageTop = () => {
       }
     };
     gettingMainData();
-  }, [wallet]);
+
+    const balanceInterval = setInterval(fetchJettonBalances, 5000);
+
+    return () => {
+      clearInterval(balanceInterval);
+    };
+  }, [wallet, fetchJettonBalances]);
 
   const toggleSwap = useCallback(() => {
     setSwapType(swapType === "usdt" ? "root" : "usdt");
