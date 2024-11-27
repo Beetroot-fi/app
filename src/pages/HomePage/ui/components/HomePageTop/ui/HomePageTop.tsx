@@ -165,7 +165,7 @@ export const HomePageTop = () => {
 
     try {
       setIsSwapDisabled(true);
-      const transaction = await tonConnectUi.sendTransaction({
+      await tonConnectUi.sendTransaction({
         messages: [
           {
             address: walletAddress,
@@ -176,11 +176,9 @@ export const HomePageTop = () => {
         validUntil: Date.now() + 5 * 60 * 1000,
       });
 
-      if (transaction) {
-        await (isUsdtSwap
-          ? apiService.deposit(wallet.account.address)
-          : apiService.withdraw(wallet.account.address));
-      }
+      await (isUsdtSwap
+        ? apiService.deposit(wallet.account.address)
+        : apiService.withdraw(wallet.account.address));
     } catch (err) {
       console.error("Error during Swap:", err);
     } finally {
