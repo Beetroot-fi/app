@@ -228,10 +228,10 @@ export const HomePageTop = () => {
     };
   }, [calculatedValue, swapType, currentTabNum, wallet, rootJettonWallet]);
 
-  const formatRootPrice = (price: number | undefined): string => {
-    if (typeof price !== "number") return "0.00";
-    return (price / 10000).toFixed(2); // Делим на 10,000 для нужного формата
-  };
+  // const formatRootPrice = (price: number | undefined): string => {
+  //   if (typeof price !== "number") return "0.00";
+  //   return (price / 10000).toFixed(2); // Делим на 10,000 для нужного формата
+  // };
 
   return (
     <div className={s.wrapper}>
