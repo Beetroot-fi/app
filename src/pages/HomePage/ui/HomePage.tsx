@@ -7,7 +7,6 @@ import s from "./HomePage.module.scss";
 
 export const HomePage = () => {
   const [showLoader, setShowLoader] = useState(() => {
-    // Проверяем, есть ли информация о показе загрузчика
     return !sessionStorage.getItem("homePageLoaderShown");
   });
 
@@ -18,8 +17,8 @@ export const HomePage = () => {
   }, [showLoader]);
   return (
     <div className={s.wrapper}>
-      {showLoader && <HomePageLoader setShowLoader={setShowLoader}/>}
-      <HomePageBanner/>
+      {showLoader && <HomePageLoader setShowLoader={setShowLoader} />}
+      <HomePageBanner />
       <HomePageTop />
       <HomePageFaq />
     </div>

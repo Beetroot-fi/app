@@ -8,7 +8,7 @@ interface Props {
 }
 
 export const HomePageLoader: React.FC<Props> = ({ setShowLoader }) => {
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const onClick = () => {
     setLoading(true);
     if (!localStorage.getItem("first_login")) {
@@ -28,11 +28,13 @@ export const HomePageLoader: React.FC<Props> = ({ setShowLoader }) => {
   };
   return (
     <div className={s.wrapper}>
-        {loading && <div className={s.loader_wrapper}>
-        <div className={s.loader}>
-          <LoaderIcon />
+      {loading && (
+        <div className={s.loader_wrapper}>
+          <div className={s.loader}>
+            <LoaderIcon />
+          </div>
         </div>
-      </div>}
+      )}
       <div className={s.inner}>
         <div className={s.img}>
           <img src="/logo.png" alt="" />
