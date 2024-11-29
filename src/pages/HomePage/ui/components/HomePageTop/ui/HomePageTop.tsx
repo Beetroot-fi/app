@@ -267,7 +267,7 @@ export const HomePageTop = () => {
       <div className={s.roots}>
         <div className={s.root}>
           <p>ROOT PRICE</p>
-          <p>${metrics?.root_price}</p>
+          <p>${Number(metrics?.root_price) / 1e2}</p>
         </div>
         <div className={s.root}>
           <p>ROOT TVL</p>
