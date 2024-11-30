@@ -69,47 +69,18 @@ export const HomePageTop = () => {
   }, []);
 
   useEffect(() => {
-    // Always fetch metrics
+    const metricsInterval = setInterval(fetchMetrics, 60000);
+
+    const balanceInterval = setInterval(fetchJettonBalances, 10000);
+
     fetchMetrics();
-  }, [fetchMetrics]);
-
-  useEffect(() => {
-    // Fetch jetton balances only if wallet is connected
-    if (!wallet?.account.address) {
-      // Reset jetton wallets if no wallet is connected
-      setUsdtJettonWallet(undefined);
-      setRootJettonWallet(undefined);
-      return;
-    }
-
-    const gettingMainData = async () => {
-      try {
-        const [usdtJettonWallet, rootJettonWallet] = await Promise.all([
-          getJettonBalance(
-            Address.parseRaw(wallet.account.address),
-            Address.parseRaw(USDT_JETTON_MASTER_ADDRESS)
-          ),
-          getJettonBalance(
-            Address.parseRaw(wallet.account.address),
-            Address.parseRaw(BEETROOT_JETTON_MASTER_ADDRESS)
-          ),
-        ]);
-
-        setUsdtJettonWallet(usdtJettonWallet);
-        setRootJettonWallet(rootJettonWallet);
-      } catch (error) {
-        console.error("Error fetching balances:", error);
-      }
-    };
-
-    gettingMainData();
-
-    const balanceInterval = setInterval(fetchJettonBalances, 5000);
+    fetchJettonBalances();
 
     return () => {
+      clearInterval(metricsInterval);
       clearInterval(balanceInterval);
     };
-  }, [wallet, fetchJettonBalances]);
+  }, [fetchMetrics, fetchJettonBalances]);
 
   const toggleSwap = useCallback(() => {
     setSwapType(swapType === "usdt" ? "root" : "usdt");
@@ -267,7 +238,7 @@ export const HomePageTop = () => {
       <div className={s.roots}>
         <div className={s.root}>
           <p>ROOT PRICE</p>
-          <p>${metrics ? metrics.root_price / 1e2 : "0.00"}</p>
+          <p>${metrics ? metrics.root_price : "0.00"}</p>
         </div>
         <div className={s.root}>
           <p>ROOT TVL</p>
