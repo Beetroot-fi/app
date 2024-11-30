@@ -228,11 +228,6 @@ export const HomePageTop = () => {
     };
   }, [calculatedValue, swapType, currentTabNum, wallet, rootJettonWallet]);
 
-  // const formatRootPrice = (price: number | undefined): string => {
-  //   if (typeof price !== "number") return "0.00";
-  //   return (price / 10000).toFixed(2); // Делим на 10,000 для нужного формата
-  // };
-
   return (
     <div className={s.wrapper}>
       <div className={s.swap}>
@@ -272,8 +267,7 @@ export const HomePageTop = () => {
       <div className={s.roots}>
         <div className={s.root}>
           <p>ROOT PRICE</p>
-          {/* {metrics ? formatRootPrice(metrics.root_price / 1e6) : "0.00"} */}
-          <p>$100</p>
+          <p>${metrics ? metrics.root_price / 1e2 : "0.00"}</p>
         </div>
         <div className={s.root}>
           <p>ROOT TVL</p>
