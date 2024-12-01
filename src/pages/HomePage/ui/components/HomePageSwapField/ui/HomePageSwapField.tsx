@@ -72,19 +72,13 @@ export const HomePageField: React.FC<Props> = ({
               numericValue > item.balance
           );
           setInputError(
-            !value ||
-              numericValue < 1.1 ||
+            numericValue < 1.1 ||
               isNaN(numericValue) ||
               numericValue > item.balance
           );
           return;
         }
-        setInputError(
-          !value ||
-            numericValue <= 0 ||
-            isNaN(numericValue) ||
-            numericValue > item.balance
-        );
+        setInputError(isNaN(numericValue) || numericValue > item.balance);
         setError(
           !value ||
             numericValue <= 0 ||
@@ -133,17 +127,14 @@ export const HomePageField: React.FC<Props> = ({
             parseFloat(newValue) > item.balance
         );
         setInputError(
-          parseFloat(newValue) === 0 ||
-            parseFloat(newValue) < 1.1 ||
+          parseFloat(newValue) < 1.1 ||
             isNaN(parseFloat(newValue)) ||
             parseFloat(newValue) > item.balance
         );
         return;
       }
       setInputError(
-        parseFloat(newValue) === 0 ||
-          isNaN(parseFloat(newValue)) ||
-          parseFloat(newValue) > item.balance
+        isNaN(parseFloat(newValue)) || parseFloat(newValue) > item.balance
       );
       setError(
         parseFloat(newValue) === 0 ||
@@ -169,11 +160,19 @@ export const HomePageField: React.FC<Props> = ({
       </div>
       <div className={s.field}>
         {item.disabled ? (
-          <p>{item.calculatedValue}</p>
+          <p>
+            {parseFloat(item.calculatedValue ?? "0") >= 0 ? (
+              item.calculatedValue
+            ) : item.name === "usdt" ? (
+              <span className={s.placeholder}>0.00</span>
+            ) : (
+              <span className={s.placeholder}>0.0000</span>
+            )}
+          </p>
         ) : (
           <input
             type="text"
-            placeholder={item.name === "usdt" ? "1.00" : "0.00"}
+            placeholder={item.name === "usdt" ? "0.00" : "0.0000"}
             value={inputValue}
             onChange={handleInputChange}
             className={clsx(inputError && s.error)}
