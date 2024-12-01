@@ -161,14 +161,18 @@ export const HomePageField: React.FC<Props> = ({
       <div className={s.field}>
         {item.disabled ? (
           <p>
-            {parseFloat(item.calculatedValue ?? "0") >= 0
-              ? item.calculatedValue
-              : 0}
+            {parseFloat(item.calculatedValue ?? "0") >= 0 ? (
+              item.calculatedValue
+            ) : item.name === "usdt" ? (
+              <span className={s.placeholder}>0.00</span>
+            ) : (
+              <span className={s.placeholder}>0.0000</span>
+            )}
           </p>
         ) : (
           <input
             type="text"
-            placeholder={item.name === "usdt" ? "1.00" : "0.00"}
+            placeholder={item.name === "usdt" ? "0.00" : "0.0000"}
             value={inputValue}
             onChange={handleInputChange}
             className={clsx(inputError && s.error)}
