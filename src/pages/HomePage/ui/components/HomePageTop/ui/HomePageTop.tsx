@@ -21,19 +21,19 @@ export const HomePageTop = () => {
   const [calculatedValue, setCalculatedValue] = useState("");
   const [error, setError] = useState(true);
   const [usdtSwapValue, setUsdtSwapValue] = useState("");
-  const [usdtJettonWallet, setUsdtJettonWallet] = useState<
-    JettonBalance | undefined
-  >();
   const [rootSwapValue, setRootSwapValue] = useState("");
-  const [rootJettonWallet, setRootJettonWallet] = useState<
-    JettonBalance | undefined
-  >();
   const [swapType, setSwapType] = useState<"usdt" | "root">("usdt");
   const [currentTabNum, setCurrentTabNum] = useState<number | null>(null);
   const [tonConnectUi] = useTonConnectUI();
-  const [metrics, setMetrics] = useState<MetricsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSwapDisabled, setIsSwapDisabled] = useState(false);
+  const [metrics, setMetrics] = useState<MetricsResponse | null>(null);
+  const [rootJettonWallet, setRootJettonWallet] = useState<
+    JettonBalance | undefined
+  >();
+  const [usdtJettonWallet, setUsdtJettonWallet] = useState<
+    JettonBalance | undefined
+  >();
 
   const fetchJettonBalances = useCallback(async () => {
     if (!wallet?.account.address) return;
@@ -240,7 +240,8 @@ export const HomePageTop = () => {
       <div className={s.roots}>
         <div className={s.root}>
           <p>ROOT PRICE</p>
-          <p>${metrics ? metrics.root_price : "0.00"}</p>
+          {/* {metrics ? metrics.root_price : "0.00"} */}
+          <p>$100</p>
         </div>
         <div className={s.root}>
           <p>ROOT TVL</p>
