@@ -169,7 +169,11 @@ export const HomePageField: React.FC<Props> = ({
       </div>
       <div className={s.field}>
         {item.disabled ? (
-          <p>{item.calculatedValue}</p>
+          <p>
+            {parseFloat(item.calculatedValue ?? "0") >= 0
+              ? item.calculatedValue
+              : 0}
+          </p>
         ) : (
           <input
             type="text"
