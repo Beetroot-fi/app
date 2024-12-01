@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import s from "./HomePageSwapField.module.scss";
+import { useState } from "react";
 
 interface Props {
   item: {
@@ -27,18 +28,23 @@ export const HomePageField: React.FC<Props> = ({
   setInputValue,
 }) => {
   const bottomTabs = ["25%", "50%", "max"];
+  const [inputError, setInputError] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let { value } = e.target;
 
-    // Разрешаем ввод только положительных чисел, включая дробные, с не более чем 2 знаками после точки
-    if (/^\d*\.?\d{0,2}$/.test(value)) {
+    // Выбираем количество допустимых знаков после точки в зависимости от item.name
+    const decimalPlaces = item.name === "usdt" ? 2 : 4;
+
+    // Разрешаем ввод только положительных чисел с заданным количеством знаков после точки
+    const regex = new RegExp(`^\\d*\\.?\\d{0,${decimalPlaces}}$`);
+    if (regex.test(value)) {
       const numericValue = parseFloat(value);
 
       // Ограничиваем значение максимальным балансом
-      if (numericValue > item.balance) {
-        value = item.balance.toFixed(2);
-      }
+      // if (numericValue > item.balance) {
+      //   value = item.balance.toFixed(decimalPlaces);
+      // }
 
       setInputValue(value);
       if (item.setCurrentTabNum) {
@@ -48,14 +54,43 @@ export const HomePageField: React.FC<Props> = ({
       // Устанавливаем setCalculatedValue с учетом курса
       if (item.course && item.setCalculatedValue) {
         const calculatedValue = value
-          ? (parseFloat(value) * item.course).toFixed(2)
+          ? (
+              (parseFloat(value) - (item.name === "usdt" ? 1 : 0)) *
+              item.course
+            ).toFixed(item.name === "usdt" ? 4 : 2)
           : "";
         item.setCalculatedValue(calculatedValue);
       }
 
       // Проверяем корректность ввода для setError
       if (setError) {
-        setError(!value || numericValue <= 0 || isNaN(numericValue));
+        if (item.name === "usdt") {
+          setError(
+            !value ||
+              numericValue < 1.1 ||
+              isNaN(numericValue) ||
+              numericValue > item.balance
+          );
+          setInputError(
+            !value ||
+              numericValue < 1.1 ||
+              isNaN(numericValue) ||
+              numericValue > item.balance
+          );
+          return;
+        }
+        setInputError(
+          !value ||
+            numericValue <= 0 ||
+            isNaN(numericValue) ||
+            numericValue > item.balance
+        );
+        setError(
+          !value ||
+            numericValue <= 0 ||
+            isNaN(numericValue) ||
+            numericValue > item.balance
+        );
       }
     }
   };
@@ -67,11 +102,11 @@ export const HomePageField: React.FC<Props> = ({
     let newValue = "";
 
     if (bottomTabs[index] === "25%") {
-      newValue = (item.balance * 0.25).toFixed(2); // 25% от баланса
+      newValue = (item.balance * 0.25).toFixed(item.name === "usdt" ? 2 : 4); // 25% от баланса
     } else if (bottomTabs[index] === "50%") {
-      newValue = (item.balance * 0.5).toFixed(2); // 50% от баланса
+      newValue = (item.balance * 0.5).toFixed(item.name === "usdt" ? 2 : 4); // 50% от баланса
     } else if (bottomTabs[index] === "max") {
-      newValue = item.balance.toFixed(2); // Полный баланс
+      newValue = item.balance.toFixed(item.name === "usdt" ? 2 : 4); // Полный баланс
     }
 
     setInputValue(newValue);
@@ -79,14 +114,42 @@ export const HomePageField: React.FC<Props> = ({
     // Обновляем calculatedValue с учетом курса
     if (item.course && item.setCalculatedValue) {
       const calculatedValue = newValue
-        ? (parseFloat(newValue) * item.course).toFixed(2)
+        ? (
+            (parseFloat(newValue) - (item.name === "usdt" ? 1 : 0)) *
+            item.course
+          ).toFixed(item.name === "usdt" ? 4 : 2)
         : "";
       item.setCalculatedValue(calculatedValue);
     }
 
     // Проверяем значение для setError
+
     if (setError) {
-      setError(parseFloat(newValue) === 0 || isNaN(parseFloat(newValue)));
+      if (item.name === "usdt") {
+        setError(
+          parseFloat(newValue) === 0 ||
+            parseFloat(newValue) < 1.1 ||
+            isNaN(parseFloat(newValue)) ||
+            parseFloat(newValue) > item.balance
+        );
+        setInputError(
+          parseFloat(newValue) === 0 ||
+            parseFloat(newValue) < 1.1 ||
+            isNaN(parseFloat(newValue)) ||
+            parseFloat(newValue) > item.balance
+        );
+        return;
+      }
+      setInputError(
+        parseFloat(newValue) === 0 ||
+          isNaN(parseFloat(newValue)) ||
+          parseFloat(newValue) > item.balance
+      );
+      setError(
+        parseFloat(newValue) === 0 ||
+          isNaN(parseFloat(newValue)) ||
+          parseFloat(newValue) > item.balance
+      );
     }
   };
 
@@ -110,15 +173,18 @@ export const HomePageField: React.FC<Props> = ({
         ) : (
           <input
             type="text"
-            placeholder="1.00"
+            placeholder={item.name === "usdt" ? "1.00" : "0.00"}
             value={inputValue}
             onChange={handleInputChange}
+            className={clsx(inputError && s.error)}
           />
         )}
       </div>
       {item.giveItAway && (
         <div className={s.bottom}>
-          <div className={s.bottom_l}>Swap fee: 1 USDT</div>
+          <div className={s.bottom_l}>
+            {item.name === "usdt" && "Swap fee: 1 USDT"}
+          </div>
           <div className={s.bottom_r}>
             {bottomTabs.map((tab, i) => (
               <div

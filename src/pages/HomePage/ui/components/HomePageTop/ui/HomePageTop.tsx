@@ -87,6 +87,8 @@ export const HomePageTop = () => {
     setUsdtSwapValue("");
     setRootSwapValue("");
     setCalculatedValue("");
+    rootFieldItem.setCurrentTabNum(null);
+    usdtFieldItem.setCurrentTabNum(null);
     setError(true);
   }, [swapType]);
 

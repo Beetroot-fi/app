@@ -4,6 +4,7 @@ import { HomePageFaq } from "./components/HomePageFaq";
 import { HomePageLoader } from "./components/HomePageLoader";
 import { HomePageTop } from "./components/HomePageTop";
 import s from "./HomePage.module.scss";
+import { HomePageDiagram } from "./components/HomePageDiagram";
 
 export const HomePage = () => {
   const [showLoader, setShowLoader] = useState(() => {
@@ -20,6 +21,7 @@ export const HomePage = () => {
       {showLoader && <HomePageLoader setShowLoader={setShowLoader} />}
       <HomePageBanner />
       <HomePageTop />
+      <HomePageDiagram />
       <HomePageFaq />
     </div>
   );
