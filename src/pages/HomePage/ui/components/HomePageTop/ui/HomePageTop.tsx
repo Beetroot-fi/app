@@ -120,16 +120,9 @@ export const HomePageTop = () => {
       return;
     }
 
-    const finalSwapValue =
-      isUsdtSwap && jettonWallet?.balance
-        ? Number(jettonWallet.balance) - swapValue >= 1_000_000
-          ? swapValue + 1_000_000
-          : swapValue
-        : swapValue;
-
     const transferBody = getJettonTransferBody(
       0n,
-      BigInt(finalSwapValue),
+      BigInt(swapValue),
       Address.parseRaw(MAIN_SC_ADDRESS),
       Address.parseRaw(wallet.account.address),
       toNano(isUsdtSwap ? "0.65" : "0.9"),
@@ -138,20 +131,20 @@ export const HomePageTop = () => {
 
     try {
       setIsSwapDisabled(true);
-      await tonConnectUi.sendTransaction({
-        messages: [
-          {
-            address: walletAddress,
-            amount: toNano(isUsdtSwap ? "0.7" : "1").toString(),
-            payload: transferBody.toBoc().toString("base64"),
-          },
-        ],
-        validUntil: Date.now() + 5 * 60 * 1000,
-      });
+      // await tonConnectUi.sendTransaction({
+      //   messages: [
+      //     {
+      //       address: walletAddress,
+      //       amount: toNano(isUsdtSwap ? "0.7" : "1").toString(),
+      //       payload: transferBody.toBoc().toString("base64"),
+      //     },
+      //   ],
+      //   validUntil: Date.now() + 5 * 60 * 1000,
+      // });
 
-      await (isUsdtSwap
-        ? apiService.deposit(wallet.account.address)
-        : apiService.withdraw(wallet.account.address));
+      // await (isUsdtSwap
+      //   ? apiService.deposit(wallet.account.address)
+      //   : apiService.withdraw(wallet.account.address));
     } catch (err) {
       console.error("Error during Swap:", err);
     } finally {
