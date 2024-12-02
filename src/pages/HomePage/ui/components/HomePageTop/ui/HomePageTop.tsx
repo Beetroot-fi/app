@@ -1,18 +1,18 @@
 import { DblArrowIcon } from "../../../../../../components/Icons/DblArrowIcon";
-import { getJettonTransferBody } from "../../../../../../methods/jettonUtils";
+// import { getJettonTransferBody } from "../../../../../../methods/jettonUtils";
 import { HomePageField } from "../../HomePageSwapField/ui/HomePageSwapField";
-import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
+import { useTonWallet } from "@tonconnect/ui-react";
 import { getJettonBalance } from "../../../../../../methods/tonapi";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { MetricsResponse } from "../../../../../../types";
 import Btn from "../../../../../../components/Btn/Btn";
 import { apiService } from "../../../../../../api";
 import { JettonBalance } from "@ton-api/client";
-import { Address, toNano } from "@ton/core";
+import { Address } from "@ton/core";
 import s from "./HomePageTop.module.scss";
 import {
   BEETROOT_JETTON_MASTER_ADDRESS,
-  MAIN_SC_ADDRESS,
+  // MAIN_SC_ADDRESS,
   USDT_JETTON_MASTER_ADDRESS,
 } from "../../../../../../consts";
 
@@ -24,7 +24,7 @@ export const HomePageTop = () => {
   const [rootSwapValue, setRootSwapValue] = useState("");
   const [swapType, setSwapType] = useState<"usdt" | "root">("usdt");
   const [currentTabNum, setCurrentTabNum] = useState<number | null>(null);
-  const [tonConnectUi] = useTonConnectUI();
+  // const [tonConnectUi] = useTonConnectUI();
   const [loading, setLoading] = useState(true);
   const [isSwapDisabled, setIsSwapDisabled] = useState(false);
   const [metrics, setMetrics] = useState<MetricsResponse | null>(null);
@@ -108,9 +108,9 @@ export const HomePageTop = () => {
     if (error || !wallet?.account.address || isSwapDisabled) return;
 
     const isUsdtSwap = swapType === "usdt";
-    const swapValue = isUsdtSwap
-      ? Math.floor(parseFloat(usdtSwapValue) * 1e6)
-      : Math.floor(parseFloat(rootSwapValue) * 1e9);
+    // const swapValue = isUsdtSwap
+    //   ? Math.floor(parseFloat(usdtSwapValue) * 1e6)
+    //   : Math.floor(parseFloat(rootSwapValue) * 1e9);
 
     const jettonWallet = isUsdtSwap ? usdtJettonWallet : rootJettonWallet;
     const walletAddress = jettonWallet?.walletAddress.address.toRawString();
@@ -120,14 +120,14 @@ export const HomePageTop = () => {
       return;
     }
 
-    const transferBody = getJettonTransferBody(
-      0n,
-      BigInt(swapValue),
-      Address.parseRaw(MAIN_SC_ADDRESS),
-      Address.parseRaw(wallet.account.address),
-      toNano(isUsdtSwap ? "0.65" : "0.9"),
-      null
-    );
+    // const transferBody = getJettonTransferBody(
+    //   0n,
+    //   BigInt(swapValue),
+    //   Address.parseRaw(MAIN_SC_ADDRESS),
+    //   Address.parseRaw(wallet.account.address),
+    //   toNano(isUsdtSwap ? "0.65" : "0.9"),
+    //   null
+    // );
 
     try {
       setIsSwapDisabled(true);
