@@ -45,5 +45,16 @@ export const apiService = {
         } catch (error) {
             throw error;
         }
+    },
+
+    getJobStatus: async (job_id: string) => {
+        try {
+            const response = await api.get('/v1/process/status', {
+                params: { job_id },
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
     }
 };
