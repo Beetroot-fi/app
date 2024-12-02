@@ -112,7 +112,7 @@ export const HomePageTop = () => {
       try {
         const response = await apiService.getJobStatus(existingJobId);
 
-        if (response.status === "completed") {
+        if (response.status === "complete") {
           setIsSwapDisabled(false);
           localStorage.removeItem("jobId");
         } else {
