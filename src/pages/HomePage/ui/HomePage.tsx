@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { HomePageBanner } from "./components/HomePageBanner";
 import { HomePageFaq } from "./components/HomePageFaq";
 import { HomePageLoader } from "./components/HomePageLoader";
 import { HomePageTop } from "./components/HomePageTop";
@@ -19,7 +18,6 @@ export const HomePage = () => {
   return (
     <div className={s.wrapper}>
       {showLoader && <HomePageLoader setShowLoader={setShowLoader} />}
-      <HomePageBanner />
       <HomePageTop />
       <HomePageDiagram />
       <HomePageFaq />
