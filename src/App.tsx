@@ -4,6 +4,13 @@ import { apiService } from "./api";
 import { useRoutes } from "react-router-dom";
 import routesConfig from "./routesConfig";
 
+import telegramAnalytics from "@telegram-apps/analytics";
+
+telegramAnalytics.init({
+  token: import.meta.env.VITE_TG_ANALYTICS_TOKEN,
+  appName: import.meta.env.VITE_TG_ANALYTICS_APP_NAME,
+});
+
 interface AuthWrapperProps {
   children: React.ReactNode;
 }
